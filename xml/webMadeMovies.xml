@@ -21,21 +21,20 @@
     <places>
       <place id="acc" type="building" name="Austin Convention Center">
         <resource id="acchomepage" src="http://www.austinconventioncenter.com/" description="Austin Convention Center"/>
+        <resource id="accwiki" src="http://en.wikipedia.org/wiki/Austin_Convention_Center" description="Austin Convention Center Wiki"/>
       </place>
       <place id="saopaulo" type="city" name="Sao Paulo">
-        <resource id="saupaulowiki" src="http://en.wikipedia.org/wiki/S%C3%A3o_Paulo" description="Sao Paulo city, Brazil"/>
+        <resource id="saupaulowiki" src="http://en.wikipedia.org/wiki/S%C3%A3o_Paulo" title="S%C3%A3o_Paulo" description="Sao Paulo city, Brazil"/>
       </place>
     </places>
     <attributions>
       <attribution id="attrib" nameofwork="A Shared Culture" copyrightholder="Jesse Dylan"
                    license="CC-BY-NC-ND"  licenseurl="http://creativecommons.org/licenses/by-nc/2.0/"/>
     </attributions>
-  </manifest>
-  
-  <articles>
-  <resource id="theinternet" src="http://en.wikipedia.org/wiki/internet" description="The Internet"/>
-  </articles>
-  
+    <articles>
+      <resource id="theinternet" src="http://en.wikipedia.org/wiki/internet" description="The Internet"/>
+    </articles>
+  </manifest>  
   <timeline>
     <subtitles>
       <subtitle in="00:00:05:00" out="00:00:07:00">Hello! My name is Celine Celine</subtitle>
@@ -65,76 +64,9 @@
     <resources>
       <twitter source="#oilspill" title="BP Oil Spill" target="twitter" width="238" height="160"/>
       <twitter in="00:00:01:00" out="00:00:20:00" title="Celine Celine" source="from:celinecelines" target="personaltwitter" width="238" height="120"/>
-      <popcorn>
-  <manifest>
-    <people>
-      <person id="celine" name="Celine" salutation="Miss." >
-        <resource id="celinehomepage" src="http://www.celinecelines.com/" description="Celine's Homepage" />
-        <resource id="celinetwitter" src="http://twitter.com/celinecelines" description="Celine's Twitter" />
-      </person>
-      <person id="brian" name="brian" >
-        <resource id="briantwitter" src="http://twitter.com/bchirls" description="Brian's twitter" />
-      </person>
-      <person id="mona" name="Mona" >
-        <resource id="monahomepage" src="http://monakasra.com/" description="Mona's Homepage"/>
-      </person>
-      <person id="dave" name="Dave" >
-        <resource id="davetwitter" src="http://twitter.com/academicdave" description="Dave's twitter" />
-      </person>
-      <person id="noah" name="Noah" >
-        <resource id="noahtwitter" src="http://twitter.com/noahworkman" description="Noah's Twitter Feed" />
-      </person>
-    </people>
-    <places>
-      <place id="acc" type="building" name="Austin Convention Center">
-        <resource id="acchomepage" src="http://www.austinconventioncenter.com/" description="Austin Convention Center"/>
-      </place>
-      <place id="saopaulo" type="city" name="Sao Paulo">
-        <resource id="saupaulowiki" src="http://en.wikipedia.org/wiki/S%C3%A3o_Paulo" description="Sao Paulo city, Brazil"/>
-      </place>
-    </places>
-    <attributions>
-      <attribution id="attrib" nameofwork="A Shared Culture" copyrightholder="Jesse Dylan"
-                   license="CC-BY-NC-ND"  licenseurl="http://creativecommons.org/licenses/by-nc/2.0/"/>
-    </attributions>
-  </manifest>
-  <timeline>
-    <subtitles>
-      <subtitle in="00:00:05:00" out="00:00:07:00">Hello! My name is Celine Celine</subtitle>
-      <subtitle in="00:00:07:00" out="00:00:09:00">And I help the Internet be easier</subtitle>
-      <subtitle in="00:00:09:00" out="00:00:12:00">by making things easier</subtitle>
-      <subtitle in="00:00:15:00" out="00:00:17:00">My name is Mona Kasra</subtitle>
-      <subtitle in="00:00:17:00" out="00:00:19:00">and I'm building a better internet</subtitle>
-      <subtitle in="00:00:32:00" out="00:00:34:00">I make the Internet better</subtitle>
-      <subtitle in="00:00:34:00" out="00:00:36:00">producing and sharing music</subtitle>
-      <subtitle in="00:36:00" out="00:38:00">using creative commons</subtitle>
-      <subtitle in="00:00:42:00" out="00:00:44:00">I make the Internet better</subtitle>
-      <subtitle in="00:00:44:00" out="00:00:46:00">because I fight for open educational resources</subtitle>
-      <subtitle in="00:00:46:00" out="00:00:47:00">on the web</subtitle>
-      <subtitle in="00:00:51:00" out="00:00:53:00">I make the Internet better</subtitle>
-      <subtitle in="00:00:53:00" out="00:00:54.5:00">by hacking things</subtitle>
-      <subtitle in="00:00:54.5:00" out="00:00:56:00">without using a single line of code</subtitle>
-      <subtitle in="00:00:56:00" out="00:00:57:00">I make the Internet better</subtitle>
-      <subtitle in="00:00:57:00" out="00:01:00:00">by changing the world of journalism</subtitle>
-      <subtitle in="00:01:01:00" out="00:01:02:15">you can mobilize people</subtitle>
-      <subtitle in="00:01:02:15" out="00:01:05:00">you don't need to have money anymore</subtitle>
-      <subtitle in="00:01:05:00" out="00:01:08:00">or big structures</subtitle>
-      <subtitle in="00:01:08:00" out="00:01:09:00">you can do everything at home with the Internet</subtitle>
-    </subtitles>
-    <footnotes>
-      <footnote in="00:00:00" out="00:14:00" target="footnotediv"> This video made exclusively for drumbeat.org </footnote>
-    </footnotes>
-    <resources>
-      <twitter source="#oilspill" title="BP Oil Spill" target="twitter" width="238" height="160"/>
-      <twitter in="00:00:05:02" out="00:00:10:07" title="Steve Song" source="from:stevesong" target="personaltwitter" width="238" height="120"/>
-      <twitter in="00:00:18:04" out="00:00:25:02" title="Keyboard Cat" source="#keyboardcat" target="twitter" width="238" height="120"/>
-      <twitter in="00:00:28:09" out="00:00:29:07 source="#oilspill" title="BP Oil Spill" target="twitter" width="238" height="160"/>
-      <twitter in="00:00:29:08" out="00:00:31:00" title="Steve Song" source="from:stevesong" target="personaltwitter" width="238" height="120"/>
-
-      <attribution in="00:00:05:02" out="00:00:10:07" target="container5" resourceid="attrib">The Village Telco, Richard Mills</attribution>
-      <attribution in="00:00:18:04" out="00:00:25:02" target="container5" resourceid="attrib">KeyBoard Cat, Charlie Schmidt</attribution>
-      <attribution in="00:00:28:09" out="00:00:29:07" target="container5" resourceid="attrib">Grassroots Mapping, Tungsten Monkey</attribution>
-      
+      <wiki in="00:00:02:00" out="00:00:15:00" resourceid="saupaulowiki" numberOfWords="200" target="wikidiv"/>
+      <wiki in="00:00:10:00" out="00:00:25:00" resourceid="accwiki" target="wikidiv"/>
+      <attribution in="00:00:1:00" out="00:40:00" target="container5" resourceid="attrib" />
       <attribution in="00:42:00" out="00:00:48:00" target="container5">A Shared Culture, Jesse Dylan</attribution>
       <flickr in="00:01:00" out="00:20:00" target="flickr" userid="13072070" numberofimages="8" padding="4px"/>
       <wiki in="00:00:32:00" out="00:00:41:00" resourceid="theinternet" numberOfWords="200" target="wikidiv"/>
