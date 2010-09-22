@@ -149,7 +149,7 @@
     this.params["in"] = "0";
     this.params["out"] = this.videoManager.videoElement.duration;
 
-    // Adds all attributes from the xml tag into this.params
+    // Adds all attributes from the xml/json tag into this.params
     for (var i = 0, pl = params.length; i < pl; i++) {
       for (var j = 0, nl = params[i].length; j < nl; j++) {
         var key = params[i].item(j).nodeName,
@@ -780,7 +780,7 @@
   Popcorn.FootnoteCommand = function(name, params, text, videoManager) {
     Popcorn.VideoCommand.call(this, name, params, text, videoManager);
     this.onIn = function() {
-      //if the user specifies a target div for this in the xml use it
+      //if the user specifies a target div for this in the xml/json use it
       //otherwise make a new div 
       if(this.params.target) {
         document.getElementById(this.params.target).innerHTML  = this.text;
@@ -951,11 +951,11 @@
   };
 
   ////////////////////////////////////////////////////////////////////////////
-  // XML Parser
+  // XML Converter
   ////////////////////////////////////////////////////////////////////////////
 
-  // Parses xml into command objects and adds them to the video manager
-  var parse = function(xmlDoc, videoManager) {
+  // Converts xml into command objects and adds them to the video manager
+  var convertXML = function(xmlDoc, videoManager) {
 
     var parseNode = function(node, attributes, manifest) {
       var allAttributes = attributes.slice(0);
@@ -990,13 +990,69 @@
     }
   };
 
+  ////////////////////////////////////////////////////////////////////////////
+  // JSON Converter
+  ////////////////////////////////////////////////////////////////////////////
+
+  // Converts json into command objects and adds them to the video manager
+  var convertJSON = function(jsonDoc, videoManager) {
+    for (var i = 0, il = jsonDoc.length; i < il; i++) {
+      var jsonData = JSON.parse(jsonDoc[i]);
+
+      // nodeType is either timeline or manifest
+      for (var nodeType in jsonData) {
+        if (jsonData.hasOwnProperty(nodeType) && (nodeType === "manifest" || nodeType === "timeline")) {
+        
+          // loops through commands in the json
+          for (var nodeName in jsonData[nodeType]) {
+            if (jsonData[nodeType].hasOwnProperty(nodeName)) {
+            
+              // loops through multiple commands of same type
+              for (var j = 0, jl = jsonData[nodeType][nodeName].length; j < jl; j++) {
+                var allAttributes = [],
+                    attributes = [],
+                    l = 0,
+                    text = "";
+                // loops through attributes inside command, and packages them similar to how the xml data looks
+                for (var attribute in jsonData[nodeType][nodeName][j]) {
+                  if (jsonData[nodeType][nodeName][j].hasOwnProperty(attribute)) {
+                    if (attribute !== "text") {
+                      attributes.push({"nodeName":attribute,"nodeValue":jsonData[nodeType][nodeName][j][attribute]});
+                      l++;
+                    } else {
+                      text = jsonData[nodeType][nodeName][j][attribute];
+                    }
+                  }
+                }
+                allAttributes = [];
+                // this object mimics the object used for xml
+                allAttributes.push({
+                  "att": attributes.slice(0),
+                  "item": function(i) {
+                    return this.att[i];
+                  },
+                  "length": l
+                });
+                if (nodeType === "manifest") {
+                  videoManager.addManifestObject(allAttributes);
+                } else {
+                  videoManager.addCommand(commands[nodeName].create(nodeName, allAttributes, text, videoManager));
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  
   // Loads an external xml file, and returns the xml object
-  var loadXMLDoc = function(name) {
+  var getTimelineData = function(name) {
     var xhttp = new XMLHttpRequest();
     if (xhttp) {
       xhttp.open("GET", name, false);
       xhttp.send();
-      return xhttp.responseXML;
+      return xhttp;
     } else {
       return false;
     }
@@ -1009,16 +1065,27 @@
       var videoSources = video[i].getAttribute('data-timeline-sources');
       if (videoSources) {
         var filenames = videoSources.split(' '),
-            xml = [];
+            dataXML = [],
+            dataJSON = [];
         for (var j=0, fl=filenames.length; j<fl; j++) {
           if (filenames[j]) {
-            xml.push(loadXMLDoc(filenames[j]));
+            var ext = (filenames[j].toLowerCase()).match(/\.json$|\.xml$/);
+            if (ext[0] === ".json") {
+              dataJSON.push(getTimelineData(filenames[j]).responseText);
+            } else if (ext[0] === ".xml") {
+              dataXML.push(getTimelineData(filenames[j]).responseXML);
+            }
           }
         }
         var manager = new Popcorn.VideoManager(video[i]);
         video[i].addEventListener('loadedmetadata', (function() {
           return function() {
-            parse(xml, manager);
+            if (dataJSON.length > 0) {
+              convertJSON(dataJSON, manager);
+            }
+            if (dataXML.length > 0) {
+              convertXML(dataXML, manager);
+            }
             manager.loaded();
           };
         }()), false);
