@@ -24,6 +24,7 @@
   Popcorn.VideoManager.prototype.addManifestObject = function(manifestAttributes) {
     var manifest = {},
         manifestId = "";
+        alert(manifestAttributes);
     for (var i = 0, pl = manifestAttributes.length; i < pl; i++) {
       for (var j = 0, nl = manifestAttributes[i].length; j < nl; j++) {
         var key = manifestAttributes[i].item(j).nodeName,
@@ -154,8 +155,13 @@
       for (var j = 0, nl = params[i].length; j < nl; j++) {
         var key = params[i].item(j).nodeName,
             data = params[i].item(j).nodeValue;
+        if (key === "start_time") {
+          key = "in";
+        } else if (key === "end_time") {
+          key = "out";
+        }
         if (key === "in" || key === "out") {
-          this.params[key] = toSeconds(data);
+          this.params[key] = (typeof data === "number" ? data : toSeconds(data));
         } else {
           this.params[key] = data;
         }
@@ -999,52 +1005,36 @@
     for (var i = 0, il = jsonDoc.length; i < il; i++) {
       var jsonData = JSON.parse(jsonDoc[i]);
 
-      // nodeType is either timeline or manifest
-      for (var nodeType in jsonData) {
-        if (jsonData.hasOwnProperty(nodeType) && (nodeType === "manifest" || nodeType === "timeline")) {
-        
-          // loops through commands in the json
-          for (var nodeName in jsonData[nodeType]) {
-            if (jsonData[nodeType].hasOwnProperty(nodeName)) {
-            
-              // loops through multiple commands of same type
-              for (var j = 0, jl = jsonData[nodeType][nodeName].length; j < jl; j++) {
-                var allAttributes = [],
-                    attributes = [],
-                    l = 0,
-                    text = "";
-                // loops through attributes inside command, and packages them similar to how the xml data looks
-                for (var attribute in jsonData[nodeType][nodeName][j]) {
-                  if (jsonData[nodeType][nodeName][j].hasOwnProperty(attribute)) {
-                    if (attribute !== "text") {
-                      attributes.push({"nodeName":attribute,"nodeValue":jsonData[nodeType][nodeName][j][attribute]});
-                      l++;
-                    } else {
-                      text = jsonData[nodeType][nodeName][j][attribute];
-                    }
-                  }
-                }
-                allAttributes = [];
-                // this object mimics the object used for xml
-                allAttributes.push({
-                  "att": attributes.slice(0),
-                  "item": function(i) {
-                    return this.att[i];
-                  },
-                  "length": l
-                });
-                if (nodeType === "manifest") {
-                  videoManager.addManifestObject(allAttributes);
-                } else {
-                  videoManager.addCommand(commands[nodeName].create(nodeName, allAttributes, text, videoManager));
-                }
-              }
+      // loops through subtitles in the json
+      for (var j = 0, jl = jsonData.length; j < jl; j++) {
+        var allAttributes = [],
+            attributes = [],
+            l = 0,
+            text = "";
+        // loops through attributes inside command, and packages them similar to how the xml data looks
+        for (var attribute in jsonData[j]) {
+          if (jsonData[j].hasOwnProperty(attribute)) {
+            if (attribute !== "text") {
+              attributes.push({"nodeName":attribute,"nodeValue":jsonData[j][attribute]});
+              l++;
+            } else {
+              text = jsonData[j][attribute];
             }
           }
         }
+        allAttributes = [];
+        // this object mimics the object used for xml
+        allAttributes.push({
+          "att": attributes.slice(0),
+          "item": function(i) {
+            return this.att[i];
+          },
+          "length": l
+        });
+        videoManager.addCommand(commands["subtitle"].create("subtitle", allAttributes, text, videoManager));
       }
     }
-  }
+  };
   
   // Loads an external xml file, and returns the xml object
   var getTimelineData = function(name) {
