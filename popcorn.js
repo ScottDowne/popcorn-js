@@ -24,7 +24,6 @@
   Popcorn.VideoManager.prototype.addManifestObject = function(manifestAttributes) {
     var manifest = {},
         manifestId = "";
-        alert(manifestAttributes);
     for (var i = 0, pl = manifestAttributes.length; i < pl; i++) {
       for (var j = 0, nl = manifestAttributes[i].length; j < nl; j++) {
         var key = manifestAttributes[i].item(j).nodeName,
