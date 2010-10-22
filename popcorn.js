@@ -24,18 +24,46 @@
   // The video manager manages a single video element, and all it's commands.
   popcorn.VideoManager = function(videoElement) {
     this.commandObjects  = {};
+    this.commandsByIn    = [];
+    this.inIndex         = 0;
+    this.commandsByOut   = [];
+    this.outIndex        = 0;
     this.manifestObjects = {};
+    this.previousTime = 0;
     this.videoElement = videoElement;
     videoElement.videoManager = this;
     popcorn.addInstance(this);
     videoElement.setAttribute("ontimeupdate", "popcorn.update(this);"); 
   };
 
+  // commands are stored in two arrays, one sorted by out time, and the other sorted by in time
   popcorn.VideoManager.prototype.addCommand = function(command) {
     this.commandObjects[command.id] = command;
+    this.commandsByIn.push(command);
+    this.commandsByIn.sort(function(a, b){
+      return (a.params["in"] - b.params["in"]);
+    });
+    this.commandsByOut.push(command);
+    this.commandsByOut.sort(function(a, b){
+      return (a.params["out"] - b.params["out"]);
+    });
+    
   };
 
   popcorn.VideoManager.prototype.removeCommand = function(command) {
+    // loop through in and out commands, check id, and remove accordingly
+    for (var i = 0, il = this.commandsByIn.length; i < il; i++) {
+      if (command.id === this.commandsByIn[i].id) {
+        this.commandsByIn.splice(i, 1);
+        break;
+      }
+    }
+    for (var o = 0, ol = this.commandsByOut.length; o < ol; o++) {
+      if (command.id === this.commandsByOut[o].id) {
+        this.commandsByOut.splice(o, 1);
+        break;
+      }
+    }
     delete this.commandObjects[command.id];
   };
 
@@ -63,52 +91,83 @@
   popcorn.VideoManager.prototype.loaded = function() {};
   
   var inactiveTarget = {};
-  
-  // Update is called on the video every time it's time changes.
+  var callOut = function(command) {
+    if (inactiveTarget[command.params.target] <= 0 || --inactiveTarget[command.params.target] <= 0) {
+      $("#" + command.params.target + " .inactive").fadeIn(500);
+    }
+    command.onOut();
+    command.extension.onOut();
+  };
+  var callIn = function(command) {
+    $("#" + command.params.target + " .inactive").hide();
+    inactiveTarget[command.params.target]++;
+
+    if (command.params.target) {
+      $("#" + command.params.target + " .overlay").show().fadeOut(500);
+    }
+    if (typeof command.flash === "undefined") {
+       var section = $(command.target).parents('section');
+       if (!section.hasClass('hover')) {
+          section.addClass('hover');    
+          section.attr('hoveron', $('video')[0].currentTime);
+       }
+    }
+    command.onIn();
+    command.extension.onIn();
+  };
+
+  // Update is called on the video every time its time changes.
+  // commands are stored in sorted in and out arrays
+  // inIndex and outIndex are values for the last know array positions
+  // These indexes travel up and down the sorted in and out arrays
   popcorn.update = function(vid) {
     var t = vid.currentTime,
-        commandObject = {}; // Loops through all commands in the manager, preloading data, and calling onIn() or onOut().
-    for (var i in vid.videoManager.commandObjects) {
-      if (vid.videoManager.commandObjects.hasOwnProperty(i)) {
-        commandObject = vid.videoManager.commandObjects[i];
-        if (commandObject.running && (commandObject.params["in"] > t || commandObject.params["out"] < t)) {
-          commandObject.running = false;
-          if (inactiveTarget[commandObject.params.target] <= 0 || --inactiveTarget[commandObject.params.target] <= 0) {
-            $("#" + commandObject.params.target + " .inactive").fadeIn(500);
-          }
-          commandObject.onOut();
-          commandObject.extension.onOut();
+        commandsByOut = vid.videoManager.commandsByOut,
+        commandsByIn = vid.videoManager.commandsByIn;
+    if (vid.videoManager.previousTime <= t) { // seeking forwards
+      while (commandsByOut[vid.videoManager.outIndex].params["out"] < t) {
+        callOut(commandsByOut[vid.videoManager.outIndex]);
+        // check if falling off end of array
+        if (vid.videoManager.outIndex < commandsByOut.length-1) {
+          vid.videoManager.outIndex++;
+        } else {
+          return; // exits update();
+        }
+      }
+      while (commandsByIn[vid.videoManager.inIndex].params["in"] < t) {
+        if (commandsByIn[vid.videoManager.inIndex].params["out"] > t) {
+          callIn(commandsByIn[vid.videoManager.inIndex]);
+        }
+        // check if falling off end of array
+        if (vid.videoManager.inIndex < commandsByIn.length-1) {
+          vid.videoManager.inIndex++;
+        } else {
+          return; // exits update();
+        }
+      }
+    } else { // seeking backwards
+      while (commandsByIn[vid.videoManager.inIndex].params["in"] > t) {
+        callOut(commandsByIn[vid.videoManager.inIndex]);
+        // check if falling off front of array
+        if (vid.videoManager.inIndex > 0) {
+          vid.videoManager.inIndex--;
+        } else {
+          return; // exits update();
+        }
+      }
+      while (commandsByOut[vid.videoManager.outIndex].params["out"] > t) {
+        if (commandsByOut[vid.videoManager.outIndex].params["in"] < t) {
+          callIn(commandsByOut[vid.videoManager.outIndex]);
+        }
+        // check if falling off front of array
+        if (vid.videoManager.outIndex > 0) {
+          vid.videoManager.outIndex--;
+        } else {
+          return; // exits update();
         }
       }
     }
-    for (var j in vid.videoManager.commandObjects) {
-      if (vid.videoManager.commandObjects.hasOwnProperty(j)) {
-        commandObject = vid.videoManager.commandObjects[j];
-        if (!commandObject.loaded && (commandObject.params["in"] - 5) < t && commandObject.params["out"] > t) {
-          commandObject.loaded = true;
-          commandObject.preload();
-        }
-        if (!commandObject.running && commandObject.params["in"] < t && commandObject.params["out"] > t) {
-          commandObject.running = true;
-          
-          $("#" + commandObject.params.target + " .inactive").hide();
-          inactiveTarget[commandObject.params.target]++;
-
-          if (commandObject.params.target) {
-            $("#" + commandObject.params.target + " .overlay").show().fadeOut(500);
-          }
-          if (typeof commandObject.flash === "undefined") {
-             var section = $(commandObject.target).parents('section');
-             if (!section.hasClass('hover')) {
-                section.addClass('hover');    
-                section.attr('hoveron', $('video')[0].currentTime);
-             }
-          }
-          commandObject.onIn();
-          commandObject.extension.onIn();
-        }
-      }
-    }
+    vid.videoManager.previousTime = t;
   };
 
   // Store VideoManager instances
