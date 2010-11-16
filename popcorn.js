@@ -29,25 +29,33 @@
     this.commandsByOut   = [];
     this.outIndex        = 0;
     this.manifestObjects = {};
-    this.previousTime = 0;
+    this.previousUpdateTime = 0;
     this.videoElement = videoElement;
+    this.parsed = false;
     videoElement.videoManager = this;
     popcorn.addInstance(this);
-    videoElement.setAttribute("ontimeupdate", "popcorn.update(this);"); 
+    videoElement.setAttribute("ontimeupdate", "popcorn.update(this);");
+    this.addCommand({"params": {"in": -1, "out": -1}, "extension": {"onIn": function() {}, "onOut": function() {}}, "onIn": function() {}, "onOut": function() {}});
+    this.addCommand({"params": {"in": 999, "out": 999}, "extension": {"onIn": function() {}, "onOut": function() {}}, "onIn": function() {}, "onOut": function() {}});
   };
 
   // commands are stored in two arrays, one sorted by out time, and the other sorted by in time
   popcorn.VideoManager.prototype.addCommand = function(command) {
     this.commandObjects[command.id] = command;
     this.commandsByIn.push(command);
-    this.commandsByIn.sort(function(a, b){
-      return (a.params["in"] - b.params["in"]);
-    });
     this.commandsByOut.push(command);
-    this.commandsByOut.sort(function(a, b){
-      return (a.params["out"] - b.params["out"]);
-    });
-    
+    this.sortCommands();
+  };
+
+  popcorn.VideoManager.prototype.sortCommands = function() {
+    if (this.parsed === true) { // only sort the commands after all the initial commands have been added
+      this.commandsByIn.sort(function(a, b){
+        return (a.params["in"] - b.params["in"]);
+      });
+      this.commandsByOut.sort(function(a, b){
+        return (a.params["out"] - b.params["out"]);
+      });
+    }
   };
 
   popcorn.VideoManager.prototype.removeCommand = function(command) {
@@ -121,53 +129,41 @@
   // inIndex and outIndex are values for the last know array positions
   // These indexes travel up and down the sorted in and out arrays
   popcorn.update = function(vid) {
-    var t = vid.currentTime,
+    var currentTime = vid.currentTime,
         commandsByOut = vid.videoManager.commandsByOut,
         commandsByIn = vid.videoManager.commandsByIn;
-    if (vid.videoManager.previousTime <= t) { // seeking forwards
-      while (commandsByOut[vid.videoManager.outIndex].params["out"] < t) {
-        callOut(commandsByOut[vid.videoManager.outIndex]);
-        // check if falling off end of array
-        if (vid.videoManager.outIndex < commandsByOut.length-1) {
-          vid.videoManager.outIndex++;
-        } else {
-          return; // exits update();
+    if (vid.videoManager.previousUpdateTime < currentTime) { // seeking forwards
+      while (commandsByOut[vid.videoManager.outIndex].params["out"] <= currentTime) {
+        if (commandsByOut[vid.videoManager.outIndex].running === true) {
+          commandsByOut[vid.videoManager.outIndex].running = false;
+          callOut(commandsByOut[vid.videoManager.outIndex]);
         }
+        vid.videoManager.outIndex++;
       }
-      while (commandsByIn[vid.videoManager.inIndex].params["in"] < t) {
-        if (commandsByIn[vid.videoManager.inIndex].params["out"] > t) {
+      while (commandsByIn[vid.videoManager.inIndex].params["in"] <= currentTime) {
+        if (commandsByIn[vid.videoManager.inIndex].params["out"] > currentTime && commandsByIn[vid.videoManager.inIndex].running === false) {
+          commandsByIn[vid.videoManager.inIndex].running = true;
           callIn(commandsByIn[vid.videoManager.inIndex]);
         }
-        // check if falling off end of array
-        if (vid.videoManager.inIndex < commandsByIn.length-1) {
-          vid.videoManager.inIndex++;
-        } else {
-          return; // exits update();
-        }
+        vid.videoManager.inIndex++;
       }
     } else { // seeking backwards
-      while (commandsByIn[vid.videoManager.inIndex].params["in"] > t) {
-        callOut(commandsByIn[vid.videoManager.inIndex]);
-        // check if falling off front of array
-        if (vid.videoManager.inIndex > 0) {
-          vid.videoManager.inIndex--;
-        } else {
-          return; // exits update();
+      while (commandsByIn[vid.videoManager.inIndex].params["in"] > currentTime) {
+        if (commandsByIn[vid.videoManager.inIndex].running === true) {
+          commandsByIn[vid.videoManager.inIndex].running = false;
+          callOut(commandsByIn[vid.videoManager.inIndex]);
         }
+        vid.videoManager.inIndex--;
       }
-      while (commandsByOut[vid.videoManager.outIndex].params["out"] > t) {
-        if (commandsByOut[vid.videoManager.outIndex].params["in"] < t) {
+      while (commandsByOut[vid.videoManager.outIndex].params["out"] > currentTime) {
+        if (commandsByOut[vid.videoManager.outIndex].params["in"] <= currentTime && commandsByOut[vid.videoManager.outIndex].running === false) {
+          commandsByOut[vid.videoManager.outIndex].running = true;
           callIn(commandsByOut[vid.videoManager.outIndex]);
         }
-        // check if falling off front of array
-        if (vid.videoManager.outIndex > 0) {
-          vid.videoManager.outIndex--;
-        } else {
-          return; // exits update();
-        }
+        vid.videoManager.outIndex--;
       }
     }
-    vid.videoManager.previousTime = t;
+    vid.videoManager.previousUpdateTime = currentTime;
   };
 
   // Store VideoManager instances
@@ -976,6 +972,8 @@
         if (video.readyState < 1) { return; }
         clearInterval(si);
         convert(data, manager, type);
+        manager.parsed = true;
+        manager.sortCommands();
         manager.loaded();
     }, 50);
   };
