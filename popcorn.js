@@ -258,8 +258,12 @@
     // Creates a div for all lower thirds
     if (!popcorn.LowerThirdCommand.ltDiv) {
       popcorn.LowerThirdCommand.ltDiv = document.createElement('div');
-      popcorn.LowerThirdCommand.ltDiv.setAttribute('style', 
-        'padding-left:40px;padding-right:40px;padding-top:40px;position:absolute;top:150px;left:1px;color:white;font-weight:bold;font-family:sans-serif;text-shadow:black 1px 1px 3px;font-size:22px;width:450px;');
+      popcorn.LowerThirdCommand.ltDiv.style.position = "absolute";
+      popcorn.LowerThirdCommand.ltDiv.style.color = "white";
+      popcorn.LowerThirdCommand.ltDiv.style.fontWeight = "bold";
+      popcorn.LowerThirdCommand.ltDiv.style.textShadow = "black 1px 1px 3px";
+      popcorn.LowerThirdCommand.ltDiv.style.fontSize = "22px";
+      
       this.videoManager.videoElement.parentNode.appendChild(popcorn.LowerThirdCommand.ltDiv);
     }
     if (this.params.target) {
@@ -269,7 +273,10 @@
     }
     
     this.onIn = function() {
-      $(this.target).css("text-align", (this.params.align || 'left'));
+      popcorn.LowerThirdCommand.ltDiv.style.textAlign = (this.params.align || 'left');
+      popcorn.LowerThirdCommand.ltDiv.style.top = videoManager.videoElement.offsetTop + videoManager.videoElement.offsetHeight - 112 + "px";
+      popcorn.LowerThirdCommand.ltDiv.style.left = videoManager.videoElement.offsetLeft + 40 + "px";
+      
       if (this.params.languagesrc) {
         var i = document.getElementById(this.params.languagesrc).selectedIndex;
         var that = this;
@@ -295,9 +302,11 @@
         this.target.appendChild(span);
         this.target.innerHTML += "<br/>" + (this.params.role || "");
       }
+      this.target.style.display = "inline";
     };
     this.onOut = function() {
       this.target.innerHTML = "";
+      this.target.style.display = "none";
     };
   };
 
