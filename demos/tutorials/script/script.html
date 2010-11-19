@@ -1,0 +1,37 @@
+<html>
+<head>
+  <script src="../../../popcorn.js"></script>
+</head>
+<body>
+  <video src="http://scotland.proximity.on.ca/sdowne/dutch.ogg" controls data-timeline-sources="script.xml"></video>  
+  <div id="scriptdiv"></div>
+  <script>
+    var customJS = (function() {
+      var interval;
+      var content = document.getElementById("scriptdiv");
+      
+      function work() {
+        var item = document.createElement("p");
+        item.innerHTML = "working...";
+        content.appendChild(item);
+      }
+
+      return {
+        start: function() {
+          var item = document.createElement("p");
+          item.innerHTML = "starting...";
+          content.appendChild(item);
+          interval = setInterval(work, 1000);
+        },
+        stop: function() {
+          var item = document.createElement("p");
+          item.innerHTML = "done!";
+          content.appendChild(item);
+          clearInterval(interval);
+        }
+      };
+    })();
+  </script>
+</body>
+</html>
+

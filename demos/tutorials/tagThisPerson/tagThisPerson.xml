@@ -1,0 +1,7 @@
+<popcorn>
+  <timeline>
+    <videotag target="inthisvideo" in="2" out="7">Steve Song</videotag>
+    <videotag target="inthisvideo" in="2" out="5">Keyboard Cat</videotag>
+  </timeline>
+</popcorn>
+
