@@ -43,8 +43,7 @@
           startIndex: 0,
           endIndex:   0,
           previousUpdateTime: 0
-        },
-        parsers: {}
+        }
       };
       
       var isReady = function( that ) {
@@ -314,7 +313,7 @@
     
   Popcorn.Events.Natives = Popcorn.Events.UIEvents + " " + 
                             Popcorn.Events.MouseEvents + " " +
-                              Popcorn.Events.Events,
+                              Popcorn.Events.Events;
   
   Popcorn.events  = {
   
@@ -543,6 +542,9 @@
     return plugin;
   };
 
+  // stores parsers keyed on filetype
+  Popcorn.parsers = {};
+
   //  An interface for extending Popcorn 
   //  with parser functionality
   Popcorn.parser = function( name, type, definition ) {
@@ -600,15 +602,70 @@
     Popcorn.extend( Popcorn.p, parser );
     
     // keys the function name by filetype extension
-    Popcorn.data.parsers[type] = name;
+    Popcorn.parsers[type] = name;
 
     //  Push into the registry
     Popcorn.registry.push(parser);
     
     
     return parser;
-  };  
+  };
+  
+  var setup = {
+    url: '',
+    data: '',
+    dataType: '',
+    success: Popcorn.nop,
+    type: 'GET',
+    async: true, 
+    xhr: function()  {
+      return new XMLHttpRequest();
+    }
+  };   
+  
+  Popcorn.xhr = function ( options ) {
+
+    var settings = Popcorn.extend( {}, setup, options );
+
+    settings.ajax  = settings.xhr();
+    
+    if ( settings.ajax ) {
+
+      settings.ajax.open( settings.type, settings.url, settings.async ); 
+      settings.ajax.send( null ); 
+
+      return Popcorn.xhr.httpData( settings );
+    }       
+  };
+
+  
+  Popcorn.xhr.httpData = function ( settings ) {
+  
+    var data, json = null,  
+        
+    onreadystatechange = settings.ajax.onreadystatechange = function() {
+
+      if ( settings.ajax.readyState === 4 ) { 
+        
+        try {
+          json = JSON.parse(settings.ajax.responseText);
+        } catch(e) {
+          //suppress
+        };
+
+        data = {
+          xml: settings.ajax.responseXML, 
+          text: settings.ajax.responseText, 
+          json: json
+        };
+
+        settings.success.call( settings.ajax, data );
+        
+      } 
+    }; 
+    return data;  
+  };
 
   global.Popcorn = Popcorn;
   
-})(winow);
+})(window);
