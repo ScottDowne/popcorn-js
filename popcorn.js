@@ -565,32 +565,39 @@
         parseFn,
         parser = {};    
     
-    parseFn  = function ( data ) {
+    parseFn  = function ( filename ) {
         
-      if ( !data ) {
+      if ( !filename ) {
         return this;
       } 
-      
-      // retreiving parsed object
-      var tracksObject = definition( data );
 
-      // creating tracks out of parsed object
-      for ( var key in tracksObject ) {
-        if ( tracksObject.hasOwnProperty(key) ) {
+      var that = this;
 
-          // an array of tracks of all one type
-          if ( tracksObject[key].constructor === Array ) {
+      Popcorn.xhr({
+        url: filename, 
+        success: function( data ) {
 
-            for (var i = 0, tol = tracksObject.length; i < tol; i++) {
-              this[key]( tracksObject[key][i] );
+          var tracksObject = definition( data ); 
+
+          // creating tracks out of parsed object
+          for ( var key in tracksObject ) {
+            if ( tracksObject.hasOwnProperty(key) ) {
+
+              // an array of tracks of all one type
+              if ( tracksObject[key].constructor === Array ) {
+
+                for (var i = 0, tol = tracksObject[key].length; i < tol; i++) {
+                  that[key]( tracksObject[key][i] );
+                }
+
+              // one single track
+              } else if ( typeof tracksObject[key] === "object" ) {
+                that[key]( tracksObject[key] );
+              }
             }
-
-          // one single track
-          } else if ( typeof tracksObject[key] === "object" ) {
-            this[key]( tracksObject[key] );
           }
         }
-      }
+      });
 
       return this;
     };
