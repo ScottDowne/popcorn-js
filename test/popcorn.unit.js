@@ -771,7 +771,78 @@ test("XML Response", function () {
 
 });
 
+module("Popcorn Parser");
 
+test("Functions", function () {
+
+  var expects = 3, 
+      count = 0,
+      popperly = Popcorn("#video");
+      
+  function plus() {
+    if ( ++count === expects ) {
+      start();
+    }
+  }
+  
+  expect(expects);
+  
+  stop();
+
+  ok(typeof Popcorn.parser === "function", "Popcorn.parser is a function");
+  plus();
+
+  Popcorn.parser( "parseJSON" , "json", function( data ){
+    return data.json;
+  });
+
+  ok(typeof popperly.parseJSON === "function", "Popcorn.parser created a parserJSON function");
+  plus();
+
+  ok(typeof popperly.parseJSON().parseJSON("data/test.js").parseJSON === "function" , "parseJSON function is chainable");
+  plus();
+
+});
+
+test("Integrity", function () {
+
+  var expects = 2, 
+      count = 0,
+      poppercore = Popcorn("#video");
+      
+  function plus() {
+    if ( ++count === expects ) {
+      start();
+      // clean up added events after tests
+      p2.removePlugin("parserTest");
+    }
+  }
+  
+  expect(expects);
+  
+  stop();
+
+  Popcorn.plugin("parserTest", {
+    
+    start: function () {
+          
+      ok(true, "parserTest started");
+      plus();
+    },
+    end: function () {
+         
+      ok(true, "parserTest ended");
+      plus();
+
+    } 
+  });
+
+  poppercore.parseJSON("data/parserData.json");
+
+  // using seconds 5 and 6 because 1 and 2 contain other plugins
+  poppercore.currentTime(5).play().currentTime(6).play();
+
+});
 
 module("Popcorn Test Runner End");
 test("Last Check", function () {
