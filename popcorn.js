@@ -283,7 +283,7 @@
         if ( byStart[i] && byStart[i].natives && byStart[i].natives.type === name ) {
           byStart.splice( i, 1 );
           i--; sl--; // update for loop if something removed, but keep checking
-          if ( this.data.trackEvents.startIndex <= i ) {
+          if ( i <= this.data.trackEvents.startIndex ) {
             this.data.trackEvents.startIndex--; // write test for this
           }
         }
@@ -292,7 +292,7 @@
         if ( byEnd[i] && byEnd[i].natives && byEnd[i].natives.type === name ) {
           byEnd.splice( i, 1 );
           i--; el--; // update for loop if something removed, but keep checking
-          if ( this.data.trackEvents.endIndex <= i ) {
+          if ( i <= this.data.trackEvents.endIndex ) {
             this.data.trackEvents.endIndex--; // write test for this
           }
         }
