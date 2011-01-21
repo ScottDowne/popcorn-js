@@ -432,7 +432,7 @@ test("Manifest", function () {
     if ( ++count === expects ) {
       start(); 
       // clean up added events after tests
-      p.removePlugin("footnote");
+      Popcorn.removePlugin("footnote");
     }
   }
   
@@ -516,12 +516,12 @@ test("Update Timer", function () {
     if ( ++count === expects ) {
       start(); 
       // clean up added events after tests
-      p2.removePlugin("forwards");
-      p2.removePlugin("backwards");
+      Popcorn.removePlugin("forwards");
+      Popcorn.removePlugin("backwards");
     }
   }
   
-  stop( 10000 );  
+  stop();  
 
   Popcorn.plugin("forwards", function () {
     return {
@@ -758,7 +758,7 @@ test("removePlugin", function () {
   equals( p.data.trackEvents.byEnd.length, 3, "p.data.trackEvents.byEnd is updated and has 3 entries");
   
   
-  p.removePlugin("breaker");
+  Popcorn.removePlugin("breaker");
   
   
   ok( !("breaker" in p), "breaker plugin is no longer available to instance" );
@@ -1326,7 +1326,7 @@ test("Parsing Integrity", function () {
       start();
       // clean up added events after tests
       clearInterval( interval );
-      poppercore.removePlugin( "parserTest" );
+      Popcorn.removePlugin( "parserTest" );
     }
   }
   

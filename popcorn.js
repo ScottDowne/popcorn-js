@@ -91,8 +91,20 @@
         history: [],
         events: {},
         trackEvents: {
-          byStart: [{start: -1, end: -1}],
-          byEnd:   [{start: -1, end: -1}],
+          byStart: [{
+            start: -1,
+            end: -1,
+              _natives: {
+                type: "_padding"
+            }
+          }],
+          byEnd:   [{
+            start: -1,
+            end: -1,
+              _natives: {
+                type: "_padding"
+            }
+          }],
           startIndex: 0,
           endIndex:   0,
           previousUpdateTime: 0
@@ -108,7 +120,10 @@
           var videoDurationPlus = that.video.duration + 1;
           Popcorn.addTrackEvent( that, {
             start: videoDurationPlus,
-            end: videoDurationPlus
+            end: videoDurationPlus,
+            _natives: {
+              type: "_padding"
+            }
           });
           
           that.video.addEventListener( "timeupdate", function( event ) {
@@ -123,38 +138,64 @@
             if ( previousTime < currentTime ) {
 
               while ( tracksByEnd[tracks.endIndex] && tracksByEnd[tracks.endIndex].end <= currentTime ) {
-                if ( tracksByEnd[tracks.endIndex]._running === true ) {
-                  tracksByEnd[tracks.endIndex]._running = false;
-                  tracksByEnd[tracks.endIndex]._natives.end.call( that, event, tracksByEnd[tracks.endIndex] );
+                // if plugin does not exist on this instance, remove it
+                if ( typeof that[ tracksByEnd[tracks.endIndex]._natives.type ] !== "undefined" || tracksByEnd[tracks.endIndex]._natives.type === "_padding" ) {
+                  if ( tracksByEnd[tracks.endIndex]._running === true ) {
+                    tracksByEnd[tracks.endIndex]._running = false;
+                    tracksByEnd[tracks.endIndex]._natives.end.call( that, event, tracksByEnd[tracks.endIndex] );
+                  }
+                  tracks.endIndex++;
+                } else {
+                  // remove track event
+                  Popcorn.removeTrackEvent( that, tracksByEnd[tracks.endIndex]._id );
+                  return;
                 }
-                tracks.endIndex++;
               }
               
               while ( tracksByStart[tracks.startIndex] && tracksByStart[tracks.startIndex].start <= currentTime ) {
-                if ( tracksByStart[tracks.startIndex].end > currentTime && tracksByStart[tracks.startIndex]._running === false ) {
-                  tracksByStart[tracks.startIndex]._running = true;
-                  tracksByStart[tracks.startIndex]._natives.start.call( that, event, tracksByStart[tracks.startIndex] );
-                }
-                tracks.startIndex++;
+                // if plugin does not exist on this instance, remove it
+                //if ( typeof that[ tracksByStart[tracks.startIndex]._natives.type ] !== "undefined" /*|| tracksByStart[tracks.startIndex]._natives.type === "_padding" */) {
+                  if ( tracksByStart[tracks.startIndex].end > currentTime && tracksByStart[tracks.startIndex]._running === false ) {
+                    tracksByStart[tracks.startIndex]._running = true;
+                    tracksByStart[tracks.startIndex]._natives.start.call( that, event, tracksByStart[tracks.startIndex] );
+                  }
+                  tracks.startIndex++;
+                //} else {
+                  // remove track event
+                //  Popcorn.removeTrackEvent( that, tracksByStart[tracks.startIndex]._id );
+                //}
               }
 
             // Playbar receding
             } else if ( previousTime > currentTime ) {
 
               while ( tracksByStart[tracks.startIndex] && tracksByStart[tracks.startIndex].start > currentTime ) {
-                if ( tracksByStart[tracks.startIndex]._running === true ) {
-                  tracksByStart[tracks.startIndex]._running = false;
-                  tracksByStart[tracks.startIndex]._natives.end.call( that, event, tracksByStart[tracks.startIndex] );
+                // if plugin does not exist on this instance, remove it
+                if ( typeof that[ tracksByStart[tracks.startIndex]._natives.type ] !== "undefined" || tracksByStart[tracks.startIndex]._natives.type === "_padding" ) {
+                  if ( tracksByStart[tracks.startIndex]._running === true ) {
+                    tracksByStart[tracks.startIndex]._running = false;
+                    tracksByStart[tracks.startIndex]._natives.end.call( that, event, tracksByStart[tracks.startIndex] );
+                  }
+                  tracks.startIndex--;
+                } else {
+                  // remove track event
+                  Popcorn.removeTrackEvent( that, tracksByStart[tracks.startIndex]._id );
+                  return;
                 }
-                tracks.startIndex--;
               }
               
               while ( tracksByEnd[tracks.endIndex] && tracksByEnd[tracks.endIndex].end > currentTime ) {
-                if ( tracksByEnd[tracks.endIndex].start <= currentTime && tracksByEnd[tracks.endIndex]._running === false ) {
-                  tracksByEnd[tracks.endIndex]._running = true;
-                  tracksByEnd[tracks.endIndex]._natives.start.call( that, event, tracksByEnd[tracks.endIndex] );
-                }
-                tracks.endIndex--;
+                // if plugin does not exist on this instance, remove it
+                //if ( typeof that[ tracksByEnd[tracks.endIndex]._natives.type ] !== "undefined" /*|| tracksByEnd[tracks.endIndex]._natives.type === "_padding" */) {
+                  if ( tracksByEnd[tracks.endIndex].start <= currentTime && tracksByEnd[tracks.endIndex]._running === false ) {
+                    tracksByEnd[tracks.endIndex]._running = true;
+                    tracksByEnd[tracks.endIndex]._natives.start.call( that, event, tracksByEnd[tracks.endIndex] );
+                  }
+                  tracks.endIndex--;
+                //} else {
+                  // remove track event
+                //  Popcorn.removeTrackEvent( that, tracksByEnd[tracks.endIndex]._id );
+                //}
               }
             } 
             /*
@@ -315,42 +356,6 @@
       
       this.listen("timeupdate", callback);
       
-      return this;
-    },
-    removePlugin: function( name ) {
-
-      var byStart = this.data.trackEvents.byStart, 
-          byEnd = this.data.trackEvents.byEnd;
-  
-      delete Popcorn.p[ name ];
-  
-      // remove plugin reference from registry
-      for ( var r = 0, rl = Popcorn.registry.length; r < rl; r++ ) {
-        if ( Popcorn.registry[r].type === name ) {
-          Popcorn.registry.splice(r, 1);
-          break; // plugin found, stop checking
-        }
-      }
-
-      // remove all trackEvents
-      for ( var s = 0, sl = byStart.length; s < sl; s++ ) {
-        if ( byStart[s] && byStart[s]._natives && byStart[s]._natives.type === name ) {
-          byStart.splice( s, 1 );
-          s--; sl--; // update for loop if something removed, but keep checking
-          if ( this.data.trackEvents.startIndex <= s ) {
-            this.data.trackEvents.startIndex--; // write test for this
-          }
-        }
-      }
-      for ( var e = 0, el = byEnd.length; e < el; e++ ) {
-        if ( byEnd[e] && byEnd[e]._natives && byEnd[e]._natives.type === name ) {
-          byEnd.splice( e, 1 );
-          e--; el--; // update for loop if something removed, but keep checking
-          if ( this.data.trackEvents.endIndex <= e ) {
-            this.data.trackEvents.endIndex--; // write test for this
-          }
-        }
-      }
       return this;
     }
   });
@@ -515,6 +520,32 @@
 
   };
 
+  Popcorn.removePlugin = function( obj, name ) {
+
+    // check if we are removing plugin from an instance or from all of Popcorn
+    if ( typeof obj === "string" ) {
+
+      // all of Popcorn it is
+      name = obj;
+      obj = Popcorn.p;
+
+      // remove plugin reference from registry
+      for ( var r = 0, rl = Popcorn.registry.length; r < rl; r++ ) {
+        if ( Popcorn.registry[r].type === name ) {
+          Popcorn.registry.splice(r, 1);
+          break; // plugin found, stop checking
+        }
+      }
+      
+    }
+
+    delete obj[ name ];
+  
+    // the tracks should be self removing
+    // we are done
+
+  };
+
   Popcorn.removeTrackEvent  = function( obj, trackId ) {
     
     var historyLen = obj.data.history.length, 
@@ -524,7 +555,7 @@
         history = []; 
     
     
-    Popcorn.forEach( obj.data.trackEvents.byStart, function( o, i, context) {
+    Popcorn.forEach( obj.data.trackEvents.byStart, function( o, i, context ) {
       
       // Preserve the original start/end trackEvents
       if ( !o._id ) {
@@ -604,6 +635,11 @@
     
     removeTrackEvent: function( id ) {
       Popcorn.removeTrackEvent.call( null, this, id );
+      return this;
+    }, 
+    
+    removePlugin: function( name ) {
+      Popcorn.removePlugin.call( null, this, name );
       return this;
     }
   
