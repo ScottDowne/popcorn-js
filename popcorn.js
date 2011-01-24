@@ -93,17 +93,11 @@
         trackEvents: {
           byStart: [{
             start: -1,
-            end: -1,
-              _natives: {
-                type: "_padding"
-            }
+            end: -1
           }],
           byEnd:   [{
             start: -1,
-            end: -1,
-              _natives: {
-                type: "_padding"
-            }
+            end: -1
           }],
           startIndex: 0,
           endIndex:   0,
@@ -120,10 +114,7 @@
           var videoDurationPlus = that.video.duration + 1;
           Popcorn.addTrackEvent( that, {
             start: videoDurationPlus,
-            end: videoDurationPlus,
-            _natives: {
-              type: "_padding"
-            }
+            end: videoDurationPlus
           });
           
           that.video.addEventListener( "timeupdate", function( event ) {
@@ -139,7 +130,7 @@
 
               while ( tracksByEnd[tracks.endIndex] && tracksByEnd[tracks.endIndex].end <= currentTime ) {
                 // if plugin does not exist on this instance, remove it
-                if ( typeof that[ tracksByEnd[tracks.endIndex]._natives.type ] !== "undefined" || tracksByEnd[tracks.endIndex]._natives.type === "_padding" ) {
+                if ( !tracksByEnd[ tracks.endIndex ]._natives || !!that[ tracksByEnd[ tracks.endIndex ]._natives.type ] ) {
                   if ( tracksByEnd[tracks.endIndex]._running === true ) {
                     tracksByEnd[tracks.endIndex]._running = false;
                     tracksByEnd[tracks.endIndex]._natives.end.call( that, event, tracksByEnd[tracks.endIndex] );
@@ -171,7 +162,7 @@
 
               while ( tracksByStart[tracks.startIndex] && tracksByStart[tracks.startIndex].start > currentTime ) {
                 // if plugin does not exist on this instance, remove it
-                if ( typeof that[ tracksByStart[tracks.startIndex]._natives.type ] !== "undefined" || tracksByStart[tracks.startIndex]._natives.type === "_padding" ) {
+                if ( !tracksByStart[tracks.startIndex]._natives || !!that[ tracksByStart[tracks.startIndex]._natives.type ] ) {
                   if ( tracksByStart[tracks.startIndex]._running === true ) {
                     tracksByStart[tracks.startIndex]._running = false;
                     tracksByStart[tracks.startIndex]._natives.end.call( that, event, tracksByStart[tracks.startIndex] );
@@ -547,7 +538,6 @@
   };
 
   Popcorn.removeTrackEvent  = function( obj, trackId ) {
-    
     var historyLen = obj.data.history.length, 
         indexWasAt = 0, 
         byStart = [], 
