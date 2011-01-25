@@ -577,13 +577,16 @@ test("Plugin Factory", function () {
 
   var popped = Popcorn("#video"), 
       methods = "load play pause currentTime mute volume roundTime exec removePlugin",
-      expects = 24, 
+      expects = 26, 
       count = 0;
   
   //expect(expects);
   
   function plus() { 
     if ( ++count == expects ) {
+      Popcorn.removePlugin("breaker");
+      Popcorn.removePlugin("executor");
+      Popcorn.removePlugin("complicator");
       start(); 
     }
   }
@@ -736,39 +739,76 @@ test("Plugin Factory", function () {
   popped.currentTime(0).play();
 });
 
-test("removePlugin", function () {
-  
-  expect(10);
+test("Remove Plugin", function () {
   
   var p = Popcorn("#video"), 
-      rlen = Popcorn.registry.length;
+      rlen = Popcorn.registry.length,
+      count = 0,
+      expects = 11,
+      interval3;
   
-  equals( rlen, 3, "Popcorn.registry.length is 3");
-  
-  
+  function plus() {
+    if ( ++count === expects ) {
+      start();
+    }
+  }
+
+  expect( expects );
+  stop( 10000 );
+  p.currentTime(0).pause();
+
+  equals( rlen, 0, "Popcorn.registry.length is empty");
+  plus();
+
   equals( p.data.trackEvents.byStart.length, 2, "p.data.trackEvents.byStart is initialized and has 2 entries");
+  plus();
   equals( p.data.trackEvents.byEnd.length, 2, "p.data.trackEvents.byEnd is initialized and has 2 entries");
-  
-  p.breaker({
-    start: 2, 
-    end: 30
+  plus();
+
+  Popcorn.plugin("removeme", {
+    
+    start: function () {
+
+    },
+    end: function () {
+
+    }
+  });
+
+  p.removeme({
+    start: 2,
+    end: 3
   });     
   
+  equals( Popcorn.registry.length, 1, "Popcorn.registry.length is 1");
+  plus();
   equals( p.data.trackEvents.byStart.length, 3, "p.data.trackEvents.byStart is updated and has 3 entries");
+  plus();
   equals( p.data.trackEvents.byEnd.length, 3, "p.data.trackEvents.byEnd is updated and has 3 entries");
+  plus();
   
+  Popcorn.removePlugin("removeme");
   
-  Popcorn.removePlugin("breaker");
+  ok( !("removeme" in p), "removeme plugin is no longer available to instance" );
+  plus();
+  ok( !("removeme" in Popcorn.prototype), "removeme plugin is no longer available to Popcorn.prototype" );
+  plus();
+  equals( Popcorn.registry.length, 0, "Popcorn.registry.length is empty again");
+  plus();
   
-  
-  ok( !("breaker" in p), "breaker plugin is no longer available to instance" );
-  ok( !("breaker" in Popcorn.prototype), "breaker plugin is no longer available to Popcorn.prototype" );
-  
-  
-  equals( Popcorn.registry.length, 2, "Popcorn.registry.length is 2");
-  
-  equals( p.data.trackEvents.byStart.length, 2, "p.data.trackEvents.byStart is updated and has 2 entries");
-  equals( p.data.trackEvents.byEnd.length, 2, "p.data.trackEvents.byEnd is updated and has 2 entries");
+  interval3 = setInterval( function() {
+    if( p.currentTime() > 3 ) {
+
+      equals( p.data.trackEvents.byStart.length, 2, "p.data.trackEvents.byStart is updated and has 2 entries");
+      plus();
+      equals( p.data.trackEvents.byEnd.length, 2, "p.data.trackEvents.byEnd is updated and has 2 entries");
+      plus();
+      clearInterval( interval3 );
+    }
+  }, 1);
+  p.currentTime( 2 ).play();
+
+
   
 });
 
@@ -776,7 +816,6 @@ test("removePlugin", function () {
 
 
 test("Protected Names", function () {
-  
   //QUnit.reset();
   
   expect(8);
