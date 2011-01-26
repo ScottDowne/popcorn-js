@@ -741,11 +741,13 @@ test("Plugin Factory", function () {
 
 test("Remove Plugin", function () {
   
-  var p = Popcorn("#video"), 
+  var p = Popcorn("#video"),
+      p2 = Popcorn("#video"),
       rlen = Popcorn.registry.length,
       count = 0,
-      expects = 11,
-      interval3;
+      expects = 19,
+      interval3,
+      interval2;
   
   function plus() {
     if ( ++count === expects ) {
@@ -778,7 +780,12 @@ test("Remove Plugin", function () {
   p.removeme({
     start: 2,
     end: 3
-  });     
+  });    
+
+  p2.removeme({
+    start: 2,
+    end: 3
+  });
   
   equals( Popcorn.registry.length, 1, "Popcorn.registry.length is 1");
   plus();
@@ -787,15 +794,28 @@ test("Remove Plugin", function () {
   equals( p.data.trackEvents.byEnd.length, 3, "p.data.trackEvents.byEnd is updated and has 3 entries");
   plus();
   
-  Popcorn.removePlugin("removeme");
+  p.removePlugin("removeme");
   
-  ok( !("removeme" in p), "removeme plugin is no longer available to instance" );
+  ok( typeof p.removeme === "undefined", "removeme plugin is undefined to p instance" );
   plus();
-  ok( !("removeme" in Popcorn.prototype), "removeme plugin is no longer available to Popcorn.prototype" );
+  ok( ( "removeme" in Popcorn.prototype ), "removeme plugin is still available to Popcorn.prototype" );
   plus();
-  equals( Popcorn.registry.length, 0, "Popcorn.registry.length is empty again");
+  equals( Popcorn.registry.length, 1, "Popcorn.registry.length has not changed");
   plus();
-  
+
+  ok( (typeof p2.removeme === "function"), "removeme plugin is defined to p2 instance" );
+  plus();
+
+  interval2 = setInterval( function() {
+    if( p2.currentTime() > 3 ) {
+      equals( p2.data.trackEvents.byStart.length, 3, "p2.data.trackEvents.byStart is updated and has 3 entries");
+      plus();
+      equals( p2.data.trackEvents.byEnd.length, 3, "p2.data.trackEvents.byEnd is updated and has 3 entries");
+      plus();
+      clearInterval( interval2 );
+    }
+  }, 1);
+
   interval3 = setInterval( function() {
     if( p.currentTime() > 3 ) {
 
@@ -804,11 +824,30 @@ test("Remove Plugin", function () {
       equals( p.data.trackEvents.byEnd.length, 2, "p.data.trackEvents.byEnd is updated and has 2 entries");
       plus();
       clearInterval( interval3 );
+      Popcorn.removePlugin("removeme");
+  
+      ok( !("removeme" in p2), "removeme plugin is no longer available to p2 instance" );
+      plus();
+      ok( !("removeme" in Popcorn.prototype), "removeme plugin is no longer available to Popcorn.prototype" );
+      plus();
+      equals( Popcorn.registry.length, 0, "Popcorn.registry.length is empty again");
+      plus();
+  
+
+      interval2 = setInterval( function() {
+        if( p2.currentTime() > 3 ) {
+
+          equals( p2.data.trackEvents.byStart.length, 2, "p2.data.trackEvents.byStart is updated and has 2 entries");
+          plus();
+          equals( p2.data.trackEvents.byEnd.length, 2, "p2.data.trackEvents.byEnd is updated and has 2 entries");
+          plus();
+          clearInterval( interval2 );
+        }
+      }, 1);
+      p2.currentTime( 2 ).play();
     }
   }, 1);
   p.currentTime( 2 ).play();
-
-
   
 });
 

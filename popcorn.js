@@ -516,9 +516,11 @@
   Popcorn.removePlugin = function( obj, name ) {
 
     // check if we are removing plugin from an instance or from all of Popcorn
-    if ( typeof obj === "string" ) {
+    if ( typeof obj === "string" && typeof name === "undefined" ) {
 
       // all of Popcorn it is
+
+      // fix the order
       name = obj;
       obj = Popcorn.p;
 
@@ -529,11 +531,19 @@
           break; // plugin found, stop checking
         }
       }
-      
+      delete obj[ name ];
+    } else if ( typeof obj === "object" && typeof name === "string" ) {
+
+      // an instance of popcorn it is
+      obj[ name ] = undefined;
+      // note: obj[ name ] will still exist in the prototype (as it should)
+      // obj.hasOwnProperty( name ) will and always did return false
+      // I create a undefined version of the property to return and put it on the instance
+      // this makes the prototype of the property unavailable as the undefined child exists
+      // I consider this a hack
     }
 
-    delete obj[ name ];
-  
+ 
     // the tracks should be self removing
     // we are done
 
