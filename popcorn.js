@@ -107,7 +107,7 @@
       
       var isReady = function( that ) {
 
-        if ( that.video.readyState >= 2 ) {
+        if ( that.video.readyState >= 3 ) {
           // adding padding to the front and end of the arrays
           // this is so we do not fall off either end
 
