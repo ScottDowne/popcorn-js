@@ -516,7 +516,7 @@
   Popcorn.removePlugin = function( obj, name ) {
 
     // check if we are removing plugin from an instance or from all of Popcorn
-    if ( typeof obj === "string" && typeof name === "undefined" ) {
+    if ( !name ) {
 
       // all of Popcorn it is
 
@@ -524,24 +524,31 @@
       name = obj;
       obj = Popcorn.p;
 
+      var registryLength = Popcorn.registry.length,
+          registryIndex;
+
       // remove plugin reference from registry
-      for ( var r = 0, rl = Popcorn.registry.length; r < rl; r++ ) {
-        if ( Popcorn.registry[r].type === name ) {
-          Popcorn.registry.splice(r, 1);
-          break; // plugin found, stop checking
+      for ( registryIndex = 0; registryIndex < registryLength; registryIndex++ ) {
+        if ( Popcorn.registry[ registryIndex ].type === name ) {
+          Popcorn.registry.splice( registryIndex, 1 );
+
+          // delete the plugin
+          delete obj[ name ];
+
+          // plugin found, stop checking
+          return;
         }
       }
-      delete obj[ name ];
-    } else if ( typeof obj === "object" && typeof name === "string" ) {
 
-      // an instance of popcorn it is
-      obj[ name ] = undefined;
-      // note: obj[ name ] will still exist in the prototype (as it should)
-      // obj.hasOwnProperty( name ) will and always did return false
-      // I create a undefined version of the property to return and put it on the instance
-      // this makes the prototype of the property unavailable as the undefined child exists
-      // I consider this a hack
     }
+
+    // an instance of popcorn it is
+    obj[ name ] = undefined;
+    // note: obj[ name ] will still exist in the prototype (as it should)
+    // obj.hasOwnProperty( name ) will and always did return false
+    // I create a undefined version of the property to return and put it on the instance
+    // this makes the prototype of the property unavailable as the undefined child exists
+    // I consider this a hack
 
  
     // the tracks should be self removing
