@@ -796,7 +796,10 @@ test("Remove Plugin", function () {
   
   p.removePlugin("removeme");
   
-  ok( typeof p.removeme === "undefined", "removeme plugin is undefined to p instance" );
+  // p.removeme still exists on the prototype, even though we said to remove it
+  // the tracks of that type though, are removed.
+  // think of it as removing all tracks of plugin type attached to an instance
+  ok( typeof p.removeme === "function", "removeme plugin is still defined to p instance" );
   plus();
   ok( ( "removeme" in Popcorn.prototype ), "removeme plugin is still available to Popcorn.prototype" );
   plus();

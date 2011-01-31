@@ -513,6 +513,8 @@
 
   };
 
+  // removePlugin( type ) removes all tracks of that from all instances of popcorn
+  // removePlugin( obj, type ) removes all tracks of type from obj, where obj is a single instance of popcorn
   Popcorn.removePlugin = function( obj, name ) {
 
     // check if we are removing plugin from an instance or from all of Popcorn
@@ -535,24 +537,23 @@
           // delete the plugin
           delete obj[ name ];
 
-          // plugin found, stop checking
+          // plugin found and removed, stop checking, we are done
           return;
         }
       }
 
     }
 
-    // an instance of popcorn it is
-    obj[ name ] = undefined;
-    // note: obj[ name ] will still exist in the prototype (as it should)
-    // obj.hasOwnProperty( name ) will and always did return false
-    // I create a undefined version of the property to return and put it on the instance
-    // this makes the prototype of the property unavailable as the undefined child exists
-    // I consider this a hack
+    // name exists, so remove all tracks from one instance of popcorn
+    Popcorn.forEach( obj.data.trackEvents.byStart, function( o ) {
+      
+      // check if track is of type to remove
+      if ( o._natives && o._natives.type === name ) {
+        // removeTrackEvent by id
+        Popcorn.removeTrackEvent( obj, o._id );
+      }
 
- 
-    // the tracks should be self removing
-    // we are done
+    } );
 
   };
 
