@@ -107,7 +107,7 @@
       
       var isReady = function( that ) {
 
-        if ( that.video.readyState >= 3 ) {
+        if ( that.video.readyState >= 2 ) {
           // adding padding to the front and end of the arrays
           // this is so we do not fall off either end
 
@@ -169,7 +169,7 @@
                     tracksByStart[ tracks.startIndex ]._natives.end.call( that, event, tracksByStart[ tracks.startIndex ] );
                   }
                   tracks.startIndex--;
-                } else if ( tracksByStart[ tracks.startIndex ]._natives ) {
+                } else {
                   // remove track event
                   Popcorn.removeTrackEvent( that, tracksByStart[ tracks.startIndex ]._id );
                   return;
@@ -184,7 +184,7 @@
                     tracksByEnd[ tracks.endIndex ]._natives.start.call( that, event, tracksByEnd[tracks.endIndex] );
                   }
                   tracks.endIndex--;
-                } else if ( tracksByEnd[ tracks.endIndex ]._natives ) {
+                } else {
                   // remove track event
                   Popcorn.removeTrackEvent( that, tracksByEnd[ tracks.endIndex ]._id );
                   return;

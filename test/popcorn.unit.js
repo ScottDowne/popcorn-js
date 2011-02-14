@@ -809,18 +809,18 @@ test("Remove Plugin", function () {
   ok( (typeof p2.removeme === "function"), "removeme plugin is defined to p2 instance" );
   plus();
 
-  interval2 = setInterval( function() {
-    if( p2.currentTime() > 3 ) {
+  //interval2 = setInterval( function() {
+  //  if( p2.currentTime() > 3 ) {
       equals( p2.data.trackEvents.byStart.length, 3, "p2.data.trackEvents.byStart is updated and has 3 entries");
       plus();
       equals( p2.data.trackEvents.byEnd.length, 3, "p2.data.trackEvents.byEnd is updated and has 3 entries");
       plus();
       clearInterval( interval2 );
-    }
-  }, 1);
+  //  }
+  //}, 1);
 
-  interval3 = setInterval( function() {
-    if( p.currentTime() > 3 ) {
+  //interval3 = setInterval( function() {
+  //  if( p.currentTime() > 3 ) {
 
       equals( p.data.trackEvents.byStart.length, 2, "p.data.trackEvents.byStart is updated and has 2 entries");
       plus();
@@ -848,9 +848,9 @@ test("Remove Plugin", function () {
         }
       }, 1);
       p2.currentTime( 2 ).play();
-    }
-  }, 1);
-  p.currentTime( 2 ).play();
+    //}
+  //}, 1);
+  //p.currentTime( 2 ).play();
   
 });
 
@@ -921,7 +921,6 @@ test("Functions", function () {
   
   
   equals( historyRef.length, 2, "2 TrackEvents in history index");
-  
   equals( popped.data.trackEvents.byStart.length, 4, "4 TrackEvents in popped.data.trackEvents.byStart ");
   equals( popped.data.trackEvents.byEnd.length, 4, "4 TrackEvents in popped.data.trackEvents.byEnd ");
   
@@ -1432,7 +1431,7 @@ test("Parsing Integrity", function () {
 
   // interval used to wait for data to be parsed
   interval = setInterval( function() {
-    poppercore.currentTime(5).play().currentTime(6);
+    poppercore.currentTime(5).play();
   }, 2000);
 
 });
