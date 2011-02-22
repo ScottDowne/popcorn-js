@@ -1,4 +1,16 @@
 
+if ( /file/.test( location.protocol ) ) {
+
+  test("HTTP", function () {
+    
+    ok( false, "Please run test suite via an HTTP connection" );
+    
+  });
+  
+  throw "Please run test suite via an HTTP connection";
+}
+
+
 module("Popcorn");
 test("API", function () {
   
@@ -1213,7 +1225,7 @@ test("dataType: JSON Response", function () {
 
 test("JSONP Response", function () {
 
-  var expects = 6, 
+  var expects = 8, 
       count = 0;
       
   function plus() {
@@ -1224,18 +1236,18 @@ test("JSONP Response", function () {
   
   expect(expects);
   
-  stop();
+  stop(10000);
 
 
   var testObj = { "data": {"lang": "en", "length": 25} };  
 
   Popcorn.xhr({
     
-    url: 'data/jsonp.json?callback=jsonp',
+    url: 'data/jsonp.php?callback=jsonp',
     dataType: 'jsonp', 
     success: function( data ) {
       
-      ok(data, "xhr returns data");
+      ok(data, "getJSONP returns data");
       plus();
       
       
@@ -1246,11 +1258,11 @@ test("JSONP Response", function () {
   });
 
   Popcorn.xhr.getJSONP(
-    'data/jsonp.json?callback=jsonp',
+    'data/jsonp.php?callback=jsonp',
 
     function( data ) {
       
-      ok(data, "xhr returns data");
+      ok(data, "getJSONP returns data");
       plus();
       
       
@@ -1260,14 +1272,30 @@ test("JSONP Response", function () {
       
     }
   );
-  
 
-  Popcorn.getJSONP(
-    'data/jsonp.json?callback=jsonp',
+  Popcorn.xhr.getJSONP(
+    "http://api.flickr.com/services/feeds/photos_public.gne?id=35034346917@N01&lang=en-us&format=json&jsoncallback=flickr",
 
     function( data ) {
       
-      ok(data, "xhr returns data");
+      
+      
+      ok(data, "getJSONP returns flickr data");
+      plus();
+
+      equal( typeof data, "object", "getJSONP returns flickr data");
+      plus();      
+
+      
+    }
+  );  
+
+  Popcorn.getJSONP(
+    'data/jsonp.php?callback=jsonp',
+
+    function( data ) {
+      
+      ok(data, "getJSONP returns data");
       plus();
       
       
