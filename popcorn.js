@@ -726,6 +726,13 @@
 
           setup._setup.call( this, options );
         }
+
+        Popcorn.forEach( options.effects.split( ',' ), function( effect ) {
+          
+        });
+        //if ( options.effects && Popcorn.effects[ options.effects ] ) {
+        //  
+        //}
         
 
         Popcorn.addTrackEvent( this, options );
@@ -865,6 +872,20 @@
     Popcorn.parsers[ type ] = name;
 
     return parser;
+  };
+
+  Popcorn.effects = {};
+
+  Popcorn.effect = function( name, definition ) {
+
+    if ( typeof definition !== "function" ) {
+      return;
+    }
+
+    Popcorn.effects.name = definition;
+
+    return this;
+
   };
 
 
