@@ -334,21 +334,24 @@
           guid = Popcorn.guid( "execCallback" ), 
           callback = function execCallback( event ) {
 
-            if ( Math.round( this.currentTime() ) === time && !callback.fired ) {
+            // exec has not been called,
+            // but current time is greater than the exec call time
+            if ( !callback.fired && this.currentTime() >= time ) {
             
               callback.fired = true;
               
               fn.call(self, event);
-              
-              //  Enforce a once per second execution
-              setTimeout(function() {
-                
-                callback.fired = false;
-                
-              }, 1000 );
+
+            // reset exec if it has been fired,
+            // but current time is less than the exec call time
+            } else if ( callback.fired && this.currentTime() < time ) {
+
+              callback.fired = false;
+
             }
+
           };
-      
+
       callback.fired = false;
       callback.name = guid;
       
