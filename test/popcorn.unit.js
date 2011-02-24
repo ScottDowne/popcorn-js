@@ -62,10 +62,7 @@ test("Utility", function () {
   equals( typeof Popcorn.sizeOf, "function" , "Popcorn.sizeOf is a provided utility function");
   equals( typeof Popcorn.nop, "function" , "Popcorn.nop is a provided utility function");
   equals( typeof Popcorn.addTrackEvent, "function" , "Popcorn.addTrackEvent is a provided utility function");
-  
-  
-  
-  
+
 });
 
 
@@ -1532,7 +1529,6 @@ test("Parsing Integrity", function () {
 
 });
 
-
 test("Parsing Handler - References unavailable plugin", function () {
 
   var expects = 1,
@@ -1572,8 +1568,102 @@ test("Parsing Handler - References unavailable plugin", function () {
   
 });
 
+module("Popcorn Effect Plugins");
 
+test("Effect Functions", function () {
 
+  var expects = 4,
+      count = 0,
+      pops = Popcorn("#video");
+      
+  function plus() {
+    if ( ++count === expects ) {
+      start();
+    }
+  }
+  
+  expect(expects);
+  
+  stop( 10000 );
+
+  ok(typeof Popcorn.effect === "function", "Popcorn.effect is a function");
+  plus();
+
+  Popcorn.effect( "testEffect" , {});
+
+  ok(typeof Popcorn.effects.testEffect === "object", "testEffect is registered in Popcorn and is an object");
+  plus();
+
+  ok(typeof Popcorn.effects.testEffect.start === "function", "testEffect has a start function");
+  plus();
+
+  ok(typeof Popcorn.effects.testEffect.end === "function", "testEffect has a end function");
+  plus();
+
+});
+
+test("Effect Integrity", function () {
+
+  var expects = 6,
+      count = 0,
+      popps = Popcorn("#video");
+      
+  function plus() {
+    if ( ++count === expects ) {
+      Popcorn.removePlugin( "effectTestPlugin" );
+      start();
+    }
+  }
+  
+  expect(expects);
+  
+  stop( 10000 );
+
+  Popcorn.effect( "testEffect2" , {
+    start: function( event, options ) {
+      ok(true, "effect 2 start has run on " + options.nick);
+      plus();
+    },
+    end: function( event, options ) {
+      ok(true, "effect 2 end has run on " + options.nick);
+      plus();
+    }
+  });
+
+  Popcorn.effect( "testEffect3" , {
+    start: function( event, options ) {
+      ok(true, "effect 3 start has run on " + options.nick);
+      plus();
+    },
+    end: function( event, options ) {
+      ok(true, "effect 3 end has run on " + options.nick);
+      plus();
+    }
+  });
+
+  Popcorn.plugin("effectTestPlugin", {
+    start: function ( event, options ) {},
+    end: function ( event, options ) {}
+  });
+
+  popps.effectTestPlugin({
+    start: 0,
+    end: 1,
+    nick: "first",
+    // effectNotHere is testing that grabage effects won't break Popcorn
+    effects: 'testEffect2, effectNotHere, testEffect3'
+  })
+  .effectTestPlugin({
+    start: 1,
+    end: 2,
+    nick: "second",
+    // testing for only one effect
+    effects: 'testEffect3'
+  });
+
+  popps.currentTime(0).play();
+
+});
 
 module("Popcorn Test Runner End");
 test("Last Check", function () {

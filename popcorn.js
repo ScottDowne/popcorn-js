@@ -136,7 +136,7 @@
                 if ( !tracksByEnd[ tracks.endIndex ]._natives || !!that[ tracksByEnd[ tracks.endIndex ]._natives.type ] ) {
                   if ( tracksByEnd[ tracks.endIndex ]._running === true ) {
                     tracksByEnd[ tracks.endIndex ]._running = false;
-                    tracksByEnd[ tracks.endIndex ]._natives.end.call( that, event, tracksByEnd[ tracks.endIndex ] );
+                    tracksByEnd[ tracks.endIndex ].runEnd.call( that, event, tracksByEnd[ tracks.endIndex ] );
                   }
                   tracks.endIndex++;
                 } else {
@@ -151,7 +151,7 @@
                 if ( !tracksByStart[ tracks.startIndex ]._natives || !!that[ tracksByStart[ tracks.startIndex ]._natives.type ] ) {
                   if ( tracksByStart[ tracks.startIndex ].end > currentTime && tracksByStart[ tracks.startIndex ]._running === false ) {
                     tracksByStart[ tracks.startIndex ]._running = true;
-                    tracksByStart[ tracks.startIndex ]._natives.start.call( that, event, tracksByStart[ tracks.startIndex ] );
+                    tracksByStart[ tracks.startIndex ].runStart.call( that, event, tracksByStart[ tracks.startIndex ] );
                   }
                   tracks.startIndex++;
                 } else {
@@ -169,7 +169,7 @@
                 if ( !tracksByStart[ tracks.startIndex ]._natives || !!that[ tracksByStart[ tracks.startIndex ]._natives.type ] ) {
                   if ( tracksByStart[ tracks.startIndex ]._running === true ) {
                     tracksByStart[ tracks.startIndex ]._running = false;
-                    tracksByStart[ tracks.startIndex ]._natives.end.call( that, event, tracksByStart[ tracks.startIndex ] );
+                    tracksByStart[ tracks.startIndex ].runEnd.call( that, event, tracksByStart[ tracks.startIndex ] );
                   }
                   tracks.startIndex--;
                 } else {
@@ -184,7 +184,7 @@
                 if ( !tracksByEnd[ tracks.endIndex ]._natives || !!that[ tracksByEnd[ tracks.endIndex ]._natives.type ] ) {
                   if ( tracksByEnd[ tracks.endIndex ].start <= currentTime && tracksByEnd[ tracks.endIndex ]._running === false ) {
                     tracksByEnd[ tracks.endIndex ]._running = true;
-                    tracksByEnd[ tracks.endIndex ]._natives.start.call( that, event, tracksByEnd[tracks.endIndex] );
+                    tracksByEnd[ tracks.endIndex ].runStart.call( that, event, tracksByEnd[tracks.endIndex] );
                   }
                   tracks.endIndex--;
                 } else {
@@ -683,7 +683,7 @@
     
     var reserved = [ "start", "end"], 
         plugin = {},
-        pluginFn, 
+        pluginFn,
         setup;
     
     if ( typeof definition === "object" ) {
@@ -695,6 +695,9 @@
       }*/        
 
       pluginFn  = function ( options ) {
+
+        var effectsStart = [],
+            effectsEnd   = [];
         
         if ( !options ) {
           return this;
@@ -727,17 +730,50 @@
           setup._setup.call( this, options );
         }
 
-        Popcorn.forEach( options.effects.split( ',' ), function( effect ) {
-          
+        // effect plugin registration to track
+
+        // registering each specified effect to this track
+        Popcorn.forEach( ( options.effects || '' ).replace( ' ', '' ).split( ',' ), function( effect ) {
+
+          // make sure effect is registered in Popcorn.effects
+          if ( Popcorn.effects[ effect ] ) {
+
+            // track effect's start and end functions
+            effectsStart.push( Popcorn.effects[ effect ].start );
+            effectsEnd.push( Popcorn.effects[ effect ].end );
+          }
         });
-        //if ( options.effects && Popcorn.effects[ options.effects ] ) {
-        //  
-        //}
-        
+
+        // wrapper to run all start functions registered with this track
+        options.runStart = function( event, opt ) {
+
+          // calling the native start function
+          options._natives.start.call( this, event, opt );
+
+          // looping through all effect start functions
+          for ( var i = 0, startLength = effectsStart.length; i < startLength; i++ ) {
+
+            // calling start effect function
+            effectsStart[ i ].call( this, event, opt );
+          }
+        };
+
+        // wrapper to run all end functions registered with this track
+        options.runEnd = function( event, opt ) {
+
+          // calling the native end function
+          options._natives.end.call( this, event, opt );
+
+          // looping through all effect end functions
+          for ( var i = 0, endLength = effectsEnd.length; i < endLength; i++ ) {
+
+            // calling end effect function
+            effectsEnd[ i ].call( this, event, opt );
+          }
+        };
 
         Popcorn.addTrackEvent( this, options );
 
-        
         //  Future support for plugin event definitions 
         //  for all of the native events
         Popcorn.forEach( setup, function ( callback, type ) {
@@ -878,11 +914,15 @@
 
   Popcorn.effect = function( name, definition ) {
 
-    if ( typeof definition !== "function" ) {
+    if ( typeof definition !== "object" ) {
       return;
     }
 
-    Popcorn.effects.name = definition;
+    definition.start = definition.start || function(){};
+
+    definition.end = definition.end || function(){};
+
+    Popcorn.effects[ name ] = definition;
 
     return this;
 
