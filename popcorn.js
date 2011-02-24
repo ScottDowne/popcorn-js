@@ -733,7 +733,7 @@
         // effect plugin registration to track
 
         // registering each specified effect to this track
-        Popcorn.forEach( ( options.effects || '' ).replace( ' ', '' ).split( ',' ), function( effect ) {
+        Popcorn.forEach( ( options.effects || '' ).replace( /\s/g, '' ).split( ',' ), function( effect ) {
 
           // make sure effect is registered in Popcorn.effects
           if ( Popcorn.effects[ effect ] ) {
@@ -1176,3 +1176,4 @@
   }, false );
 
 })(window, window.document);
+

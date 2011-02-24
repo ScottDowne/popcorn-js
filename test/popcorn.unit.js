@@ -1604,7 +1604,7 @@ test("Effect Functions", function () {
 
 test("Effect Integrity", function () {
 
-  var expects = 6,
+  var expects = 10,
       count = 0,
       popps = Popcorn("#video");
       
@@ -1641,6 +1641,19 @@ test("Effect Integrity", function () {
     }
   });
 
+  Popcorn.effect( "testEffect4" , {
+    start: function( event, options ) {
+      equals(options.trackData, true, "effect 4 can read options data on " + options.nick);
+      // changing value of false so the state is tracked uniquely to this track
+      options.trackData = false
+      plus();
+    },
+    end: function( event, options ) {
+      equals(options.trackData, false, "effect 4 can write options data on " + options.nick);
+      plus();
+    }
+  });
+
   Popcorn.plugin("effectTestPlugin", {
     start: function ( event, options ) {},
     end: function ( event, options ) {}
@@ -1650,13 +1663,21 @@ test("Effect Integrity", function () {
     start: 0,
     end: 1,
     nick: "first",
+    trackData: true,
     // effectNotHere is testing that grabage effects won't break Popcorn
-    effects: 'testEffect2, effectNotHere, testEffect3'
+    effects: 'testEffect2, effectNotHere, testEffect3, testEffect4'
+  }).effectTestPlugin({
+    start: 1,
+    end: 2,
+    nick: "second",
+    trackData: true,
+    // testing for only one effect
+    effects: 'testEffect4'
   })
   .effectTestPlugin({
     start: 1,
     end: 2,
-    nick: "second",
+    nick: "third",
     // testing for only one effect
     effects: 'testEffect3'
   });
