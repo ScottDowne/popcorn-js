@@ -303,7 +303,7 @@ test( "Events and Player Control", function () {
   }
   
   expect(expects);
-  stop( 150000 );
+  stop();
   
   player.addEventListener( "load", function() {
     ok( true, "Load was fired" );
