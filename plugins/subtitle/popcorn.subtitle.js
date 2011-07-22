@@ -220,15 +220,13 @@
 
               options.selectedLanguage = options.languageSrc.options[ options.languageSrc.selectedIndex ].value;
 
+              options.display = "none";
+
               if ( options.accessibility.checked || options.selectedLanguage !== ( options.language || "") ) {
-
                 options.display = "inline";
-                options.container.style.display = options.display;
-              } else if ( options.selectedLanguage === ( options.language || "") ) {
-
-                options.display = "none";
-                options.container.style.display = options.display;
               }
+
+              options.container.style.display = options.display;
             };
 
             options.accessibility.addEventListener( "change", options.toggleSubtitles, false );
