@@ -598,7 +598,7 @@
       data.hash[ eventsList[idx] ] = true;
     }
 
-    apis.forEach(function( val, idx ) {
+    Popcorn.forEach( apis, function( val, idx ) {
 
       data.apis[ val ] = {};
 
