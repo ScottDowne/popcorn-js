@@ -1019,7 +1019,7 @@
     Popcorn.manifest[ name ] = manifest = manifest || definition.manifest || {};
 
     // apply safe, and empty default functions
-    methods.forEach(function( method ) {
+    Popcorn.forEach( methods, function( method ) {
 
       definition[ method ] = definition[ method ] || Popcorn.nop;
     });
@@ -1051,13 +1051,13 @@
       // join the two arrays together
       options.compose = options.compose.concat( options.effect );
 
-      options.compose.forEach(function( composeOption ) {
+      Popcorn.forEach( options.compose, function( composeOption ) {
 
         // if the requested compose is garbage, throw it away
         compose = Popcorn.compositions[ composeOption ] || {};
 
         // extends previous functions with compose function
-        methods.forEach(function( method ) {
+        Popcorn.forEach( methods, function( method ) {
 
           natives[ method ] = combineFn( natives[ method ], compose[ method ] );
         });
