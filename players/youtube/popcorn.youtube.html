@@ -23,7 +23,7 @@
           var paused = true,
               popcorn;
           
-          popcorn = Popcorn.youtube( '#video', 'http://www.youtube.com/watch?v=9oar9glUCL0' );
+          popcorn = Popcorn.youtube( '#video', 'http://www.youtube.com/watch?v=u1zgFlCw8Aw' );
           
           popcorn = popcorn
             .footnote({
@@ -105,13 +105,14 @@
           });
 
           // Setup UI after loaded
-          popcorn.listen( 'load', function() {
+          //popcorn.listen( 'load', function() {
 
             element( 'player-status' ).innerHTML = 'Ready';
             element( 'player_vol' ).innerHTML = popcorn.volume();
             
             // Single play/pause button
             element( 'btn-play-pause' ).addEventListener( 'click', function() {
+
               if ( paused ) {
                 popcorn.play();
               } else {
@@ -134,7 +135,7 @@
             element('btn-mute').addEventListener('click', function() {
               popcorn.mute( !popcorn.media.muted );
             }, false);
-          });
+          //});
         }, false );
     </script>
   </head>

@@ -11,6 +11,7 @@ Popcorn.player( "youtube", {
 
     var media = this,
         youtubeObject,
+        autoPlay = false,
         container = document.createElement( "div" ),
         currentTime = 0,
         seekTime = 0,
@@ -39,6 +40,8 @@ Popcorn.player( "youtube", {
       onYouTubePlayerReady[ container.id ] = function() {
 
         youtubeObject = document.getElementById( container.id );
+
+        media.paused && youtubeObject.pauseVideo();
 
         // more youtube callback nonsense
         onYouTubePlayerReady.stateChangeEventHandler[ container.id ] = function( state ) {
@@ -108,10 +111,14 @@ Popcorn.player( "youtube", {
 
         media.play = function() {
 
-          media.paused = false;
-          media.dispatchEvent( "play" );
+          if ( media.paused ) {
 
-          media.dispatchEvent( "playing" );
+            media.paused = false;
+            media.dispatchEvent( "play" );
+
+            media.dispatchEvent( "playing" );
+          }
+
           timeupdate();
           youtubeObject.playVideo();
         };
@@ -134,6 +141,7 @@ Popcorn.player( "youtube", {
             seeking = true;
             media.dispatchEvent( "seeked" );
             media.dispatchEvent( "timeupdate" );
+
             youtubeObject.seekTo( currentTime );
             return currentTime;
           },
@@ -213,7 +221,17 @@ Popcorn.player( "youtube", {
       };
 
       src = /^.*(?:\/|v=)(.{11})/.exec( media.src )[ 1 ];
+
       query = ( media.src.split( "?" )[ 1 ] || "" ).replace( /v=.{11}/, "" );
+      autoPlay = ( /autoplay=1/.test( query ) );
+
+      // if pause or play is not explicitly set
+      // youtube will autoplay
+      if ( autoPlay ) {
+        media.play();
+      } else {
+        media.pause();
+      }
 
       // setting youtube player's height and width, default to 560 x 315
       width = media.style.width ? ""+media.offsetWidth : "560";

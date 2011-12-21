@@ -1747,10 +1747,12 @@
 
         this.paused = false;
 
+        basePlayer.dispatchEvent( "play" );
+        basePlayer.dispatchEvent( "playing" );
+
         if ( basePlayer.readyState >= 4 ) {
 
           baselineTime = new Date() / 1000;
-          basePlayer.dispatchEvent( "play" );
           timeupdate();
         }
       };
@@ -1758,6 +1760,7 @@
       basePlayer.pause = function() {
 
         this.paused = true;
+
         basePlayer.dispatchEvent( "pause" );
       };
 
@@ -1850,6 +1853,7 @@
       basePlayer.readyState = 0;
       basePlayer.duration = 0;
       basePlayer.paused = true;
+
       basePlayer.ended = 0;
 
       if ( player._setup ) {
