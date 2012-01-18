@@ -2,20 +2,17 @@
 <html>
 <head>
   <title>Popcorn footnote Plug-in Demo</title>
-
+  <link rel="stylesheet" href="webxray.css"></link>
   <script src="../../popcorn.js"></script>
   <script src="popcorn.goggles.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', function () {
       var p = Popcorn( "#video" )
-      .play()
       .goggles({
         start: 5,
-        end: 15
-      })
-      .goggles({
-        start: 10,
-        end: 45
+        end: 15,
+        pause: 5,
+        target: "video"
       });
 
     }, false);
@@ -26,8 +23,7 @@
   <div>
     <video id="video"
       controls
-      width="250px"
-      poster="../../test/poster.png">
+      width="250px">
 
       <source id="mp4"
         src="../../test/trailer.mp4"
@@ -41,6 +37,9 @@
 
     </video>
   </div>
+  <p>From 5 to 15 the xray goggles will load on the video element.</p>
+  <p>I still need to add a pause of some sort, and make the 'X' work. Done.</p>
+  <p>Now, I need to do something with the commit changes button. I don't want it ATM, I want read only.</p>
   <div id="footnotediv" width="50%" height="50%">
   </div>
 </body>
