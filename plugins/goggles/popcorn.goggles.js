@@ -320,6 +320,7 @@
           if (event.source == iframe.get(0).contentWindow) {
           
             options.div.fadeOut( 400, function() {
+
               options.div.remove();
               options.play && self.media.play();
               options.play = false;
@@ -358,14 +359,13 @@
     start: function( event, options ){
       
       var self = this;
-      if ( options.pause && !this.media.paused ) {
+      if ( options.pause === true && !this.media.paused ) {
       
         options.play = true;
         this.media.pause();
       }
-      if ( options.pause > 0 ) {
+	  if ( options.duration > 0 ) {
 
-        //this.media.pause();
         setTimeout( function() {
         
           options.div.fadeOut( 400, function() {
@@ -374,7 +374,7 @@
             options.play && self.media.play();
             options.play = false;
           });
-        }, options.pause * 1000 );
+        }, options.duration * 1000 );
       }
       $(document.body).append( options.div );
       options.div.hide();
@@ -383,6 +383,7 @@
     end: function( event, options ){
 
       options.div.fadeOut( 400, function() {
+
         options.div.remove();
       });
     },
