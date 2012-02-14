@@ -51,6 +51,7 @@
     _setup: function( options ) {
       var target = document.getElementById( options.target ),
           validType,
+          caption = options.caption || "",
           pop;
 
       // Valid types of retrieval requests
@@ -68,7 +69,7 @@
       // Create seperate container for plugin
       options._container = document.createElement( "div" );
       options._container.id = "mediaSpawnerdiv-" + Popcorn.guid();
-      options._container.innerHTML = "<p>" + options.caption + "</p><br/>";
+      options._container.innerHTML = caption + "<br/>";
       
       document.body.appendChild( options._container );
       options.pop = processMedia[ options.mediaType ]( options );
