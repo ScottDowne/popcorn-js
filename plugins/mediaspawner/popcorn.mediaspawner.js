@@ -1,5 +1,16 @@
 ( function( Popcorn, global ) {
 
+  var processMedia = {
+    youtube: function( options ) {
+      return Popcorn.youtube( "#" + options._container.id, options.mediaSource );
+    },
+    vimeo: function( options ){
+      return Popcorn.vimeo( options._container.id, options.mediaSource ); 
+    },
+    soundcloud: function( options ){
+      return Popcorn.soundcloud( options._container.id, options.mediaSource );
+    }
+  };
   Popcorn.plugin( "mediaspawner" , {
     manifest: {
       about: {
@@ -40,7 +51,6 @@
     _setup: function( options ) {
       var target = document.getElementById( options.target ),
           validType,
-          videoId,
           pop;
 
       // Valid types of retrieval requests
@@ -57,11 +67,11 @@
 
       // Create seperate container for plugin
       options._container = document.createElement( "div" );
-      videoId = "mediaSpawnerdiv-" + Popcorn.guid();
-      options._container.id = videoId;
-      options._container.innerHTML = options.caption + "<br/>";
+      options._container.id = "mediaSpawnerdiv-" + Popcorn.guid();
+      options._container.innerHTML = "<p>" + options.caption + "</p><br/>";
       
-      pop = Popcorn.youtube( "#" + videoId, options.mediaSource );
+      document.body.appendChild( options._container );
+      options.pop = processMedia[ options.mediaType ]( options );
 
       options._container.style.display = "none";
       target && target.appendChild( options._container );
