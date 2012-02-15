@@ -2,13 +2,24 @@
 
   var processMedia = {
     youtube: function( options ) {
-      return Popcorn.youtube( "#" + options._container.id, options.mediaSource );
+      Popcorn.youtube( "#" + options._container.id, options.mediaSource );
     },
     vimeo: function( options ){
-      return Popcorn.vimeo( options._container.id, options.mediaSource ); 
+      Popcorn.vimeo( options._container.id, options.mediaSource ); 
     },
     soundcloud: function( options ){
-      return Popcorn.soundcloud( options._container.id, options.mediaSource );
+      Popcorn.soundcloud( options._container.id, options.mediaSource );
+    },
+    image: function( options ){
+      var img = document.createElement("img"),
+          link = document.createElement("a");
+      
+      img.setAttribute( "src", options.mediaSource );
+      link.setAttribute( "href", options.mediaSource );
+      link.setAttribute( "target", "_blank" );
+      link.appendChild( img );
+
+      options._container.appendChild( link );
     }
   };
   Popcorn.plugin( "mediaspawner" , {
@@ -22,7 +33,7 @@
       options: {
         mediaType: {
           elem: "select",
-          options: [ "YOUTUBE", "VIMEO", "SOUNDCLOUD"],
+          options: [ "YOUTUBE", "VIMEO", "SOUNDCLOUD", "IMAGE"],
           label: "Media Type:"
         },
         caption: {
@@ -56,7 +67,7 @@
 
       // Valid types of retrieval requests
       validType = function( type ) {
-        return ( [ "youtube", "vimeo", "soundcloud" ].indexOf( type ) > -1 );
+        return ( [ "youtube", "vimeo", "soundcloud", "image" ].indexOf( type ) > -1 );
       };
 
       // Lowercase the types incase user enters it in another way
@@ -69,10 +80,10 @@
       // Create seperate container for plugin
       options._container = document.createElement( "div" );
       options._container.id = "mediaSpawnerdiv-" + Popcorn.guid();
-      options._container.innerHTML = caption + "<br/>";
+      options._container.innerHTML = "<p>" + caption + "</p>";
       
       document.body.appendChild( options._container );
-      options.pop = processMedia[ options.mediaType ]( options );
+      processMedia[ options.mediaType ]( options );
 
       options._container.style.display = "none";
       target && target.appendChild( options._container );
