@@ -200,7 +200,6 @@ Popcorn.player( "youtube", {
         media.duration = youtubeObject.getDuration();
         media.dispatchEvent( "durationchange" );
         volumeupdate();
-
         media.dispatchEvent( "loadeddata" );
       };
 
@@ -234,8 +233,8 @@ Popcorn.player( "youtube", {
       }
 
       // setting youtube player's height and width, default to 560 x 315
-      width = media.style.width ? ""+media.offsetWidth : "560";
-      height = media.style.height ? ""+media.offsetHeight : "315";
+      width = media.style.width ? "" + media.offsetWidth : "560";
+      height = media.style.height ? "" + media.offsetHeight : "315";
 
       swfobject.embedSWF( "//www.youtube.com/e/" + src + "?" + query + "&enablejsapi=1&playerapiid=" + container.id + "&version=3",
                           container.id, width, height, "8", null, flashvars, params, attributes );

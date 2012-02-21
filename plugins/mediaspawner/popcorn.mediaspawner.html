@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Popcorn Media Spawner Plug-in Demo</title>
+  <script src="../../popcorn.js"></script>
+  <script src="popcorn.mediaspawner.js"></script>
+  <script src="../../players/youtube/popcorn.youtube.js"></script>
+  <script src="../../players/vimeo/popcorn.vimeo.js"></script>
+  <script src="../../players/soundcloud/popcorn.soundcloud.js"></script>
+  <script>
+    document.addEventListener( "DOMContentLoaded", function () {
+      var p = Popcorn( "#video" )
+      .volume(0)
+      .play()
+      .mediaspawner( {
+        mediaType: "youtube",
+        mediaSource: "http://www.youtube.com/watch?v=bUB1L3zGVvc",
+        target: "tumblrdiv",
+        start: 1,
+        end: 10,
+        caption: "This is a test. We are assuming conrol. We are assuming control." 
+      })
+      .mediaspawner( {
+        mediaType: "vimeo",
+        mediaSource: "http://player.vimeo.com/video/6960892",
+        target: "tumblrdiv",
+        start: 11,
+        end: 20,
+        caption: "This is a test. We are assuming conrol. We are assuming control." 
+      })
+      .mediaspawner( {
+        mediaType: "soundcloud",
+        mediaSource: "http://soundcloud.com/forss/flickermood",
+        target: "tumblrdiv",
+        start: 21,
+        end: 40,
+        caption: "This is a test. We are assuming conrol. We are assuming control." 
+      });
+    }, false);
+
+  </script>
+</head>
+<body>
+<h1 id="qunit-header">Popcorn Media Spawner Plug-in Demo</h1>
+  <p>All types of media spawner media types are shown below the video. This includes youtube, vimeo and soundcloud.</p>
+
+  <div>
+    <video id="video"
+      controls 
+      width= "350px"
+      poster="../../test/poster.png">
+
+      <source id="mp4"
+        src="../../test/trailer.mp4"
+        type='video/mp4; codecs="avc1, mp4a"'>
+
+      <source id="ogv"
+        src="../../test/trailer.ogv"
+        type="video/ogg;" codecs="theora, vorbis">
+
+      <p>Your user agent does not support the HTML5 Video element.</p>
+
+    </video>
+  </div>
+  <div>
+    <div id="tumblrdiv"></div>
+  </div>
+</body>
+</html>
+
