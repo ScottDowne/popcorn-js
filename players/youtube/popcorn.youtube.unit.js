@@ -1,3 +1,74 @@
+test( "Player play, pause, autoplay", function() {
+  QUnit.reset();
+
+  var count = 0,
+      expects = 10,
+      orderCheck1 = 0,
+      orderCheck2 = 0;
+
+  expect( expects );
+
+  function plus() {
+    if ( ++count === expects ) {
+      start();
+    }
+  }
+
+  stop();
+
+  var pop1 = Popcorn.youtube( "#video6", "http://www.youtube.com/watch?v=abcdefghijk" );
+
+  pop1.play();
+
+  equal( pop1.media.paused, false, "popcorn 1 plays" );
+  plus();
+
+  var pop2 = Popcorn.youtube( "#video7", "http://www.youtube.com/watch?v=abcdefghijk" );
+
+  equal( pop2.media.paused, true, "popcorn 2 pauses" );
+  plus();
+
+  var pop3 = Popcorn.youtube( "#video8", "http://www.youtube.com/watch?v=abcdefghijk&autoplay=0" );
+
+  pop3.listen( "play", function() {
+
+    equal( orderCheck1++, 0, "popcorn 3 autoplay off plays before paused" );
+    plus();
+    equal( pop3.media.paused, false, "popcorn 3 autoplay off plays" );
+    plus();
+  });
+
+  pop3.listen( "pause", function() {
+
+    equal( orderCheck1++, 1, "popcorn 3 autoplay off pauses after played" );
+    plus();
+    equal( pop3.media.paused, true, "popcorn 3 autoplay off pauses" );
+    plus();
+  });
+
+  pop3.play();
+
+  var pop4 = Popcorn.youtube( "#video9", "http://www.youtube.com/watch?v=abcdefghijk&autoplay=1" );
+
+  pop4.listen( "play", function() {
+
+    equal( orderCheck2++, 1, "popcorn 4 is autoplaying after pause" );
+    plus();
+    equal( pop4.media.paused, false, "popcorn 4 is autoplaying" );
+    plus();
+  });
+
+  pop4.listen( "pause", function() {
+
+    equal( orderCheck2++, 0, "popcorn 4 is paused before autoplay" );
+    plus();
+    equal( pop4.media.paused, true, "popcorn 4 is paused" );
+    plus();
+  });
+
+  pop4.pause();
+});
+
 test("Update Timer", function () {
 
   QUnit.reset();
@@ -25,7 +96,6 @@ test("Update Timer", function () {
     }
   }
 
-  // These tests come close to 10 seconds on chrome, increasing to 15
   stop();
 
   Popcorn.plugin( "forwards", function () {
