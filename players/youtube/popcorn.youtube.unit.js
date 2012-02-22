@@ -2,7 +2,7 @@ test( "Player play, pause, autoplay", function() {
   QUnit.reset();
 
   var count = 0,
-      expects = 1,
+      expects = 4,
       orderCheck1 = 0,
       orderCheck2 = 0;
 
@@ -16,31 +16,37 @@ test( "Player play, pause, autoplay", function() {
 
   stop( 20000 );
 
-  /*var pop1 = Popcorn.youtube( "#video6", "http://www.youtube.com/watch?v=nfGV32RNkhw" );
+  var pop1 = Popcorn.youtube( "#video6", "http://www.youtube.com/watch?v=nfGV32RNkhw" );
 
-  pop1.play();
+  pop1.listen( "load", function() {
 
-  equal( pop1.media.paused, false, "popcorn 1 plays" );
-  plus();
+    pop1.play();
+
+    equal( pop1.media.paused, false, "popcorn 1 plays" );
+    plus();
+  });
 
   var pop2 = Popcorn.youtube( "#video7", "http://www.youtube.com/watch?v=nfGV32RNkhw" );
 
-  equal( pop2.media.paused, true, "popcorn 2 pauses" );
-  plus();
+  pop2.listen( "load", function() {
+
+    equal( pop2.media.paused, true, "popcorn 2 pauses" );
+    plus();
+  });
 
   var pop3 = Popcorn.youtube( "#video8", "http://www.youtube.com/watch?v=nfGV32RNkhw&autoplay=0" );
 
   pop3.listen( "load", function() {
 
-    equal( pop3.media.paused, true, "popcorn 3 is paused" );
+    equal( pop3.media.paused, true, "popcorn 3 autoplay off paused" );
     plus();
-  });*/
+  });
 
   var pop4 = Popcorn.youtube( "#video9", "http://www.youtube.com/watch?v=nfGV32RNkhw&autoplay=1" );
 
   pop4.listen( "load", function() {
 
-    equal( pop4.media.paused, false, "popcorn 4 is playing" );
+    equal( pop4.media.paused, false, "popcorn 4 is autoplaying" );
     plus();
   });
 });
@@ -331,7 +337,7 @@ test("Plugin Factory", function () {
     end: 5
   });
 
-  popped.play();
+  popped.volume( 0 ).currentTime( 0 ).play();
 
 });
 
