@@ -2,7 +2,7 @@ test( "Player play, pause, autoplay", function() {
   QUnit.reset();
 
   var count = 0,
-      expects = 4,
+      expects = 1,
       orderCheck1 = 0,
       orderCheck2 = 0;
 
@@ -16,7 +16,7 @@ test( "Player play, pause, autoplay", function() {
 
   stop( 20000 );
 
-  var pop1 = Popcorn.youtube( "#video6", "http://www.youtube.com/watch?v=nfGV32RNkhw" );
+  /*var pop1 = Popcorn.youtube( "#video6", "http://www.youtube.com/watch?v=nfGV32RNkhw" );
 
   pop1.play();
 
@@ -32,15 +32,15 @@ test( "Player play, pause, autoplay", function() {
 
   pop3.listen( "load", function() {
 
-    equal( pop3.media.paused, true, "popcorn 3 autoplay off paused" );
+    equal( pop3.media.paused, true, "popcorn 3 is paused" );
     plus();
-  });
+  });*/
 
   var pop4 = Popcorn.youtube( "#video9", "http://www.youtube.com/watch?v=nfGV32RNkhw&autoplay=1" );
 
   pop4.listen( "load", function() {
 
-    equal( pop4.media.paused, false, "popcorn 4 is autoplaying" );
+    equal( pop4.media.paused, false, "popcorn 4 is playing" );
     plus();
   });
 });
@@ -331,7 +331,7 @@ test("Plugin Factory", function () {
     end: 5
   });
 
-  popped.volume( 0 ).currentTime( 0 ).play();
+  popped.play();
 
 });
 

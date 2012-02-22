@@ -15,7 +15,7 @@ Popcorn.player( "youtube", {
         container = document.createElement( "div" ),
         currentTime = 0,
         seekTime = 0,
-        firstGo = false,
+        firstGo = true,
         seeking = false,
 
         // state code for volume changed polling
@@ -67,7 +67,7 @@ Popcorn.player( "youtube", {
           } else
           // playing is state 1
           // paused is state 2
-          if ( state === 1 && firstGo ) {
+          if ( state === 1 && !firstGo ) {
 
             media.paused && media.play();
             return;
@@ -80,11 +80,23 @@ Popcorn.player( "youtube", {
             youtubeObject.playVideo();
             return;
           } else
-          if ( state === 1 && !firstGo ) {
+          if ( state === 1 && firstGo ) {
 
-            firstGo = true;
-            !autoPlay && media.pause();
-            autoPlay && media.play();
+            firstGo = false;
+
+            if ( media.paused === true ) {
+
+              media.pause();
+            } else if ( media.paused === false ) {
+
+              media.play();
+            } else if ( autoPlay ) {
+
+              media.play();
+            } else if ( !autoPlay ) {
+
+              media.pause();
+            }
 
             media.readyState = 4;
             media.dispatchEvent( "canplaythrough" );
@@ -140,7 +152,7 @@ Popcorn.player( "youtube", {
 
         media.play = function() {
 
-          if ( media.paused || youtubeObject.getPlayerState() !== 1 ) {
+          if ( media.paused !== false || youtubeObject.getPlayerState() !== 1 ) {
 
             media.paused = false;
             media.dispatchEvent( "play" );
@@ -154,7 +166,7 @@ Popcorn.player( "youtube", {
 
         media.pause = function() {
 
-          if ( !media.paused  || youtubeObject.getPlayerState() !== 2 ) {
+          if ( media.paused !== true || youtubeObject.getPlayerState() !== 2 ) {
 
             media.paused = true;
             media.dispatchEvent( "pause" );
@@ -248,9 +260,9 @@ Popcorn.player( "youtube", {
       // if pause or play is not explicitly set
       // youtube will autoplay
       if ( autoPlay ) {
-        media.play();
+        //!media.paused && media.play();
       } else {
-        media.pause();
+        //media.paused && media.pause();
       }
 
       // setting youtube player's height and width, default to 560 x 315
