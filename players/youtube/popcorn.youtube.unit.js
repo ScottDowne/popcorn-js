@@ -1,8 +1,68 @@
+test( "Player play, pause, autoplay", function() {
+  QUnit.reset();
+
+  var count = 0,
+      expects = 4,
+      orderCheck1 = 0,
+      orderCheck2 = 0,
+      pop1, pop2, pop3, pop4;
+
+  expect( expects );
+
+  function plus() {
+    if ( ++count === expects ) {
+
+      pop1.destroy();
+      pop2.destroy();
+      pop3.destroy();
+      pop4.destroy();
+
+      start();
+    }
+  }
+
+  stop( 20000 );
+
+  pop1 = Popcorn.youtube( "#video6", "http://www.youtube.com/watch?v=nfGV32RNkhw" );
+
+  pop1.listen( "load", function() {
+
+    pop1.play();
+
+    equal( pop1.media.paused, false, "popcorn 1 plays" );
+    plus();
+  });
+
+  pop2 = Popcorn.youtube( "#video7", "http://www.youtube.com/watch?v=nfGV32RNkhw" );
+
+  pop2.listen( "load", function() {
+
+    equal( pop2.media.paused, true, "popcorn 2 pauses" );
+    plus();
+  });
+
+  pop3 = Popcorn.youtube( "#video8", "http://www.youtube.com/watch?v=nfGV32RNkhw&autoplay=0" );
+
+  pop3.listen( "load", function() {
+
+    equal( pop3.media.paused, true, "popcorn 3 autoplay off paused" );
+    plus();
+  });
+
+  pop4 = Popcorn.youtube( "#video9", "http://www.youtube.com/watch?v=nfGV32RNkhw&autoplay=1" );
+
+  pop4.listen( "load", function() {
+
+    equal( pop4.media.paused, false, "popcorn 4 is autoplaying" );
+    plus();
+  });
+});
+
 test("Update Timer", function () {
 
   QUnit.reset();
 
-  var p2 = Popcorn.youtube( '#video2', 'http://www.youtube.com/watch?v=9oar9glUCL0' ),
+  var p2 = Popcorn.youtube( '#video2', 'http://www.youtube.com/watch?v=nfGV32RNkhw' ),
       expects = 12,
       count   = 0,
       execCount = 0,
@@ -21,11 +81,11 @@ test("Update Timer", function () {
       Popcorn.removePlugin( "backwards" );
       Popcorn.removePlugin( "wrapper" );
       p2.removePlugin( "exec" );
+      p2.destroy();
       start();
     }
   }
 
-  // These tests come close to 10 seconds on chrome, increasing to 15
   stop();
 
   Popcorn.plugin( "forwards", function () {
@@ -174,7 +234,7 @@ test("Plugin Factory", function () {
 
   QUnit.reset();
 
-  var popped = Popcorn.youtube( '#video2', 'http://www.youtube.com/watch?v=9oar9glUCL0' ),
+  var popped = Popcorn.youtube( '#video2', 'http://www.youtube.com/watch?v=nfGV32RNkhw' ),
       methods = "load play pause currentTime mute volume roundTime exec removePlugin",
       expects = 34, // 15*2+2+2. executor/complicator each do 15
       count = 0;
@@ -183,6 +243,7 @@ test("Plugin Factory", function () {
     if ( ++count == expects ) {
       Popcorn.removePlugin("executor");
       Popcorn.removePlugin("complicator");
+      popped.destroy();
       start();
     }
   }
@@ -290,17 +351,19 @@ test("Plugin Factory", function () {
 });
 
 test( "Popcorn YouTube Plugin Url and Duration Tests", function() {
-  function plus(){
-    if ( ++count == expects ) {
-      start();
-    }
-  }
 
   QUnit.reset();
 
   var count = 0,
       expects = 3,
-      popcorn = Popcorn.youtube( '#video2', 'http://www.youtube.com/watch?v=9oar9glUCL0' );
+      popcorn = Popcorn.youtube( '#video2', 'http://www.youtube.com/watch?v=nfGV32RNkhw' );
+
+  function plus(){
+    if ( ++count == expects ) {
+      popcorn.destroy();
+      start();
+    }
+  }
 
   expect( expects );
   stop( 10000 );
@@ -327,24 +390,24 @@ test( "Popcorn YouTube Plugin Url Regex Test", function() {
 
   var urlTests = [
     { name: 'standard',
-      url: 'http://www.youtube.com/watch?v=9oar9glUCL0',
-      expected: 'http://www.youtube.com/watch?v=9oar9glUCL0'
+      url: 'http://www.youtube.com/watch?v=nfGV32RNkhw',
+      expected: 'http://www.youtube.com/watch?v=nfGV32RNkhw'
     },
     { name: 'share url',
-      url: 'http://youtu.be/9oar9glUCL0',
-      expected: 'http://youtu.be/9oar9glUCL0'
+      url: 'http://youtu.be/nfGV32RNkhw',
+      expected: 'http://youtu.be/nfGV32RNkhw'
     },
     { name: 'long embed',
-      url: 'http://www.youtube.com/embed/9oar9glUCL0',
-      expected: 'http://www.youtube.com/embed/9oar9glUCL0'
+      url: 'http://www.youtube.com/embed/nfGV32RNkhw',
+      expected: 'http://www.youtube.com/embed/nfGV32RNkhw'
     },
     { name: 'short embed 1 (e)',
-      url: 'http://www.youtube.com/e/9oar9glUCL0',
-      expected: 'http://www.youtube.com/e/9oar9glUCL0'
+      url: 'http://www.youtube.com/e/nfGV32RNkhw',
+      expected: 'http://www.youtube.com/e/nfGV32RNkhw'
     },
     { name: 'short embed 2 (v)',
-      url: 'http://www.youtube.com/v/9oar9glUCL0',
-      expected: 'http://www.youtube.com/v/9oar9glUCL0'
+      url: 'http://www.youtube.com/v/nfGV32RNkhw',
+      expected: 'http://www.youtube.com/v/nfGV32RNkhw'
     },
     { name: 'contains underscore',
       url: 'http://www.youtube.com/v/GP53b__h4ew',
@@ -356,7 +419,7 @@ test( "Popcorn YouTube Plugin Url Regex Test", function() {
       expects = urlTests.length;
 
   expect( expects );
-  stop( 10000 );
+  stop();
 
   Popcorn.forEach( urlTests, function( valuse, key ) {
 
@@ -369,6 +432,9 @@ test( "Popcorn YouTube Plugin Url Regex Test", function() {
       popcorn.pause();
 
       count++;
+
+      popcorn.destroy();
+
       if ( count === expects ) {
 
         start();
@@ -381,32 +447,79 @@ test( "Controls and Annotations toggling", function() {
 
   QUnit.reset();
 
-  expect( 6 );
+  var count = 0,
+      expects = 6;
+      //popcorn = Popcorn.youtube( '#video2', 'http://www.youtube.com/watch?v=nfGV32RNkhw' );
 
-  var popcorn = Popcorn.youtube( "#video", "http://www.youtube.com/watch?v=9oar9glUCL0" ),
-      targetDiv = document.getElementById( "video" );
-      testTarget = targetDiv.querySelector( "object" ).data;
+  function plus(){
+    if ( ++count == expects ) {
+      //popcorn.destroy();
+      start();
+    }
+  }
 
-  popcorn.volume( 0 );
+  expect( expects );
+  //expect( 6 );
+  stop( 10000 );
 
-  ok( !/controls/.test( testTarget ), "controls are defaulted to 1 ( displayed )" );
-  ok( !/iv_load_policy/.test( testTarget ), "annotations ( iv_load_policy ) are defaulted to ( enabled )" );
+  var popcorn1 = Popcorn.youtube( "#video", "http://www.youtube.com/watch?v=nfGV32RNkhw" );
 
-  targetDiv.innerHTML = "";
+  popcorn1.listen( "loadeddata", function() {
+    
+    var targetDiv = document.getElementById( "video" ),
+        testTarget = targetDiv.querySelector( "object" ).data;
 
-  popcorn = Popcorn.youtube( "#video", "http://www.youtube.com/watch?v=9oar9glUCL0&controls=1&iv_load_policy=1" );
-  popcorn.volume( 0 );
+    popcorn1.volume( 0 );
+
+    ok( !/controls/.test( testTarget ), "controls are defaulted to 1 ( displayed )" );
+    plus();
+    ok( !/iv_load_policy/.test( testTarget ), "annotations ( iv_load_policy ) are defaulted to ( enabled )" );
+    plus();
+
+    popcorn1.destroy();
+
+    var popcorn2 = Popcorn.youtube( "#video", "http://www.youtube.com/watch?v=nfGV32RNkhw&controls=1&iv_load_policy=1" );
+    popcorn2.listen( "loadeddata", function() {
+      
+      var targetDiv = document.getElementById( "video" ),
+          testTarget = targetDiv.querySelector( "object" ).data;
+
+      popcorn2.volume( 0 );
+
+      ok( /controls=1/.test( testTarget ), "controls is set to 1 ( displayed )" );
+      plus();
+      ok( /iv_load_policy=1/.test( testTarget ), "annotations ( iv_load_policy ) is set to 1 ( enabled )" );
+      plus();
+
+      popcorn2.destroy();
+      
+      var popcorn3 = Popcorn.youtube( "#video", "http://www.youtube.com/watch?v=nfGV32RNkhw&controls=0&iv_load_policy=3" );
+      popcorn3.listen( "loadeddata", function() {
+        
+        var targetDiv = document.getElementById( "video" ),
+            testTarget = targetDiv.querySelector( "object" ).data;
+
+        popcorn3.volume( 0 );
+
+        ok( /controls=0/.test( testTarget ), "controls is set to 0 ( hidden )" );
+        plus();
+        ok( /iv_load_policy=3/.test( testTarget ), "annotations ( iv_load_policy ) is set to 3 ( hidden )" );
+        plus();
+
+        popcorn3.destroy();
+      });
+    });
+  });
+  
+  /*popcorn2.volume( 0 );
   testTarget = targetDiv.querySelector( "object" ).data;
-  ok( /controls=1/.test( testTarget ), "controls is set to 1 ( displayed )" );
-  ok( /iv_load_policy=1/.test( testTarget ), "annotations ( iv_load_policy ) is set to 1 ( enabled )" );
 
-  targetDiv.innerHTML = "";
-
-  popcorn = Popcorn.youtube( "#video", "http://www.youtube.com/watch?v=9oar9glUCL0&controls=0&iv_load_policy=3" );
+  var popcorn3 = Popcorn.youtube( "#video", "http://www.youtube.com/watch?v=nfGV32RNkhw&controls=0&iv_load_policy=3" );
   testTarget = targetDiv.querySelector( "object" ).data;
   ok( /controls=0/.test( testTarget ), "controls is set to 0 ( hidden )" );
   ok( /iv_load_policy=3/.test( testTarget ), "annotations ( iv_load_policy ) is set to 3 ( hidden )" );
 
+  popcorn3.destroy();*/
 });
 
 test( "Player height and width", function() {
@@ -416,8 +529,9 @@ test( "Player height and width", function() {
   expect( 4 );
 
   stop( 10000 );
-  var popcorn1 = Popcorn.youtube( "#video4", "http://www.youtube.com/watch?v=9oar9glUCL0" ),
-      popcorn2 = Popcorn.youtube( "#video5", "http://www.youtube.com/watch?v=9oar9glUCL0" ),
+
+  var popcorn1 = Popcorn.youtube( "#video4", "http://www.youtube.com/watch?v=nfGV32RNkhw" ),
+      popcorn2 = Popcorn.youtube( "#video5", "http://www.youtube.com/watch?v=nfGV32RNkhw" ),
       readyStatePoll = function() {
 
         if ( popcorn1.media.readyState !== 4 && popcorn2.media.readyState !== 4 ) {
@@ -430,6 +544,9 @@ test( "Player height and width", function() {
 
           equal( popcorn2.media.children[ 0 ].width, 0, "Youtube player explicit width is 0" );
           equal( popcorn2.media.children[ 0 ].height, 0, "Youtube player explicit height is 0" );
+
+          popcorn1.destroy();
+          popcorn2.destroy();
           start();
         }
       };
@@ -452,10 +569,13 @@ test( "Popcorn Youtube Plugin offsetHeight && offsetWidth Test", function() {
 
   function plus() {
     if ( ++count === expects ) {
+
+      popped.destroy();
       start();
     }
   }
-  popped = Popcorn.youtube( "#video6", "http://www.youtube.com/watch?v=9oar9glUCL0" );
+
+  popped = Popcorn.youtube( "#video6", "http://www.youtube.com/watch?v=nfGV32RNkhw" );
 
   var runner = function() {
     popped.volume( 0 );
@@ -472,17 +592,62 @@ test( "Popcorn Youtube Plugin offsetHeight && offsetWidth Test", function() {
     popped.listen( "loadeddata", runner);
   }
 
-  stop( 10000 );
+  stop();
 });
 
 test( "Player Errors", function() {
   QUnit.reset();
   expect( 1 );
   stop( 10000 );
-  var pop = Popcorn.youtube( "#video4", "http://www.youtube.com/watch?v=abcdefghijk" );
 
-  pop.listen( "error", function() {
-    ok( true, "error trigger by invalid URL" );
+  var pop = Popcorn.youtube( "#video4", "http://www.youtube.com/watch?v=abcdefghijk", {
+    events: {
+      error: function() {
+
+        ok( true, "error trigger by invalid URL" );
+        pop.destroy();
+        start();
+      }
+    }
+   });
+});
+
+test( "YouTube ended event", function() {
+  QUnit.reset();
+  expect(1);
+  stop( 10000 );
+
+  var pop = Popcorn.youtube( "#video10", "http://www.youtube.com/watch?v=nfGV32RNkhw" );
+
+  pop.listen( "ended", function() {
+    ok( true, "YouTube is successfully firing the ended event" );
     start();
+  });
+  pop.play( 150 );
+});
+
+test( "youtube player gets a proper _teardown", function() {
+
+  QUnit.reset();
+  
+  var count = 0,
+      expects = 1;
+
+  function plus() {
+    if ( ++count === expects ) {
+
+      start();
+    }
+  }
+
+  expect( expects );
+  stop( 10000 );
+
+  var popcorn = Popcorn.youtube( "#video9", "http://www.youtube.com/watch?v=nfGV32RNkhw" );
+  popcorn.listen( "loadeddata", function() {
+
+    popcorn.destroy();
+    equal( popcorn.media.children.length, 0, "" );
+    plus();
   });
 });
