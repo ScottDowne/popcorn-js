@@ -130,6 +130,8 @@ test( "Popcorn.getTrackEvents", function() {
   Popcorn.removeTrackEvent( popcorn, Popcorn.getTrackEvents( popcorn )[ 0 ]._id );
 
   equal( Popcorn.getTrackEvents( popcorn ).length, 0, "Popcorn.getTrackEvents() has no items after removal" );
+
+  popcorn.destroy();
 });
 
 test( "Popcorn.getTrackEvent", function() {
@@ -145,6 +147,7 @@ test( "Popcorn.getTrackEvent", function() {
     if ( ++count === expects ) {
       Popcorn.removePlugin( "temp" );
       Popcorn.removeTrackEvent( popcorn, Popcorn.getTrackEvents( popcorn )[ 0 ]._id );
+      popcorn.destroy();
     }
   }
 
@@ -295,6 +298,8 @@ test( "Popcorn.removeTrackEvent", function() {
   Popcorn.forEach([ "a", "b", "c", "d" ], function( name ) {
     Popcorn.removePlugin( name );
   });
+
+  pop.destroy();
 });
 
 test( "Popcorn.forEach", function() {
@@ -585,6 +590,7 @@ test( "Object", function() {
 
     if ( ++count === expects ) {
 
+      popped.destroy();
       start();
     }
   }
@@ -701,6 +707,8 @@ test( "Instance", function() {
   ok( a.data.trackEvents.previousUpdateTime >= -1, "instance a has data.trackEvents.previousUpdateTime property" );
   ok( b.data.trackEvents.previousUpdateTime >= -1, "instance b has data.trackEvents.previousUpdateTime property" );
 
+  a.destroy();
+  b.destroy();
 });
 
 module( "Popcorn Static" );
@@ -724,6 +732,8 @@ test( "Popcorn.[addTrackEvent | removeTrackEvent].ref()", function() {
   });
 
   equal( Popcorn.sizeOf( popped.data.trackRefs ), 0, "There are 0 trackRefs in popped.data.trackRefs" );
+
+  popped.destroy();
 });
 
 module( "Popcorn Prototype Methods" );
@@ -757,6 +767,8 @@ test( "deprecated method warning", function() {
     };
 
     $pop.listen( "foo", handler).trigger( "foo" ).unlisten( "foo", handler );
+
+    $pop.destroy();
   }
 });
 
@@ -773,6 +785,8 @@ test( "roundTime", function() {
     popped.play().pause().currentTime( 0.98 );
 
     equal( 1, popped.roundTime(), ".roundTime() returns 1 when currentTime is 0.98s" );
+
+    popped.destroy();
     start();
   });
 });
@@ -797,6 +811,7 @@ test( "exec", function() {
 
         equal( loop, expects, "cue callback repeat check, only called twice" );
         Popcorn.removePlugin( popped, "cue" );
+        popped.destroy();
         start();
 
       }, 1000 );
@@ -839,6 +854,8 @@ test( "mute", function() {
 
   function plus(){
     if ( ++count == expects ) {
+      video.destroy();
+      audio.destroy();
       start();
     }
   }
@@ -886,6 +903,7 @@ test( "play(n)/pause(n) as shorthand to currentTime(n).play()/pause()", function
 
   function plus() {
     if ( ++count == expects ) {
+      $pop.destroy();
       start();
     }
   }
@@ -1536,6 +1554,8 @@ test( "on/off/emit", function() {
   });
 
   $pop.emit( "foo" );
+
+  $pop.destroy();
 });
 
 
@@ -1875,10 +1895,11 @@ test( "Plugin toString", function() {
   trackEvent = $pop.getTrackEvent( $pop.getLastTrackEventId() );
   result = trackEvent.toString();
 
-
   ok( result, "BOO YA!", "Custom toString value" );
 
   Popcorn.removePlugin( "stringify" );
+
+  $pop.destroy();
 });
 
 test( "Exceptions", function() {
@@ -2825,6 +2846,7 @@ test( "Teardown end tester", function() {
   function plus() {
     if ( ++count === expects ) {
       Popcorn.removePlugin( "teardownEndTester" );
+      popped.destroy();
       start();
     }
   }
@@ -2877,6 +2899,7 @@ test( "Teardown end noise", function() {
     if ( ++count === expects ) {
       Popcorn.removePlugin( "teardownEndTester" );
       Popcorn.removePlugin( "noise" );
+      popped.destroy();
       start();
     }
   }
@@ -2935,6 +2958,7 @@ test( "Plugin Breaker", function() {
   function plus() {
     if ( ++count == expects ) {
       Popcorn.removePlugin( "breaker" );
+      popped.destroy();
       start();
     }
   }
@@ -2995,6 +3019,7 @@ test( "Plugin Empty", function() {
   function plus() {
     if ( ++count == expects ) {
       Popcorn.removePlugin( "empty" );
+      popped.destroy();
       start();
     }
   }
@@ -3030,6 +3055,7 @@ test( "Plugin Closure", function() {
   function plus() {
     if ( ++count == expects ) {
       Popcorn.removePlugin( "closure" );
+      popped.destroy();
       start();
     }
   }
@@ -3092,6 +3118,8 @@ test( "Remove Plugin", function() {
     if ( ++count === expects ) {
       start();
       Popcorn.removePlugin( "cleanup" );
+      p.destroy();
+      p2.destroy();
     }
   }
 
@@ -3240,6 +3268,8 @@ test( "Protected Names", function() {
       ok( true, "Attempting to overwrite '" + name + "' threw an exception " );
     };
   });
+
+  popped.destroy();
 });
 
 test( "Defaulting Empty End Values", function() {
@@ -3271,6 +3301,9 @@ test( "Defaulting Empty End Values", function() {
     apikey: "CHAyhB5IisvLqqzGYNYbmA",
     mediaid: "13607892"
   });
+
+  popped.destroy();
+  popped2.destroy();
 });
 
 test( "In/Out aliases", function() {
@@ -3285,7 +3318,7 @@ test( "In/Out aliases", function() {
   function plus() {
     if ( ++count === expects ) {
       Popcorn.removePlugin( "aliasTester" );
-      Popcorn.destroy( popcorn );
+      popcorn.destroy();
       start();
     }
   }
@@ -3428,6 +3461,8 @@ test( "Functions", function() {
   trackEvents = popped.getTrackEvents();
 
   equal( trackEvents.length, 3, "3 user created trackEvents returned by popped.getTrackEvents()" );
+
+  popped.destroy();
 });
 
 test( "getTrackEvent", function() {
@@ -3436,7 +3471,7 @@ test( "getTrackEvent", function() {
   expect( 5 );
 
   var popped = Popcorn( "#video" ),
-    trackIds = [], obj, oldId;
+      trackIds = [], obj, oldId;
 
   Popcorn.plugin( "ff", function() {
     return {
@@ -3487,6 +3522,8 @@ test( "getTrackEvent", function() {
   popped.removeTrackEvent( oldId );
 
   equal( popped.getTrackEvent( oldId ), undefined,  "returned undefined when id is not found" );
+
+  popped.destroy();
 });
 
 test( "Index Integrity ( removing tracks )", function() {
@@ -3757,6 +3794,7 @@ test( "end undefined or false should never be fired", function() {
       start();
       Popcorn.removePlugin( "neverEndingStory" );
       Popcorn.removePlugin( "endingStory" );
+      $pop.destroy();
     }
   }
 
@@ -4208,6 +4246,8 @@ test( "Basic Audio Support (timeupdate)", function() {
 
     if ( ++count === expects ) {
 
+      popped.destroy();
+      popObj.destroy();
       start();
     }
   }
