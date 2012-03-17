@@ -74,10 +74,38 @@
     })( obj );
   },
 
-  refresh = function( obj ) {
-    var currentTime = obj.media.currentTime,
+  isPlayable = function( obj, track ) {
+
+    if ( track._natives &&
+        ( !!Popcorn.registryByName[ track._natives.type ] || !!obj[ track._natives.type ] ) ) {
+
+      if ( track.end > obj.media.currentTime &&
+        track.start <= obj.media.currentTime ) {
+
+        /*track._running = true;
+        obj.data.running[ track._natives.type ].push( track );
+
+        if ( !obj.data.disabled[ track._natives.type ] ) {
+
+          track._natives.start.call( obj, null, track );
+
+          if ( obj.options.frameAnimation &&
+            track._natives.frame ) {
+
+            obj.data.trackEvents.animating.push( track );
+            track._natives.frame.call( obj, null, track, currentTime );
+          }
+        }*/
+        return true;
+      }
+    }
+    
+    return false;
+  
+  
+    /*var currentTime = obj.media.currentTime,
       animation = obj.options.frameAnimation,
-      disabled = obj.data.disabled,
+      //disabled = obj.data.disabled,
       tracks = obj.data.trackEvents,
       animating = tracks.animating,
       start = tracks.startIndex,
@@ -97,7 +125,7 @@
           ( !!registryByName[ type ] || !!obj[ type ] ) ) {
 
         if ( ( byStart.start <= currentTime && byStart.end > currentTime ) &&
-                disabled.indexOf( type ) === -1 ) {
+                !obj[ type ].disabled ) {
 
           if ( !byStart._running ) {
             byStart._running = true;
@@ -126,7 +154,7 @@
       }
 
       start--;
-    }
+    }*/
   },
 
   //  Declare constructor
@@ -219,11 +247,17 @@
 
       this.data = {
 
+        // data structure of all 
+        running: {
+          cue: [],
+          exec: [] // depricated, should we remove this?
+        },
+
         // Executed by either timeupdate event or in rAF loop
         timeUpdate: Popcorn.nop,
 
         // Allows disabling a plugin per instance
-        disabled: [],
+        disabled: {},
 
         // Stores DOM event queues by type
         events: {},
@@ -287,7 +321,28 @@
           self.data.timeUpdate = function () {
 
             Popcorn.timeUpdate( self, {} );
+      /*if ( obj.options.frameAnimation ) {
+        while ( animIndex < animating.length ) {
 
+          byAnimate = animating[ animIndex ];
+
+          if ( !byAnimate._running ) {
+            animating.splice( animIndex, 1 );
+          } else {
+            byAnimate._natives.frame.call( obj, event, byAnimate, currentTime );
+            animIndex++;
+          }
+        }
+      }*/
+            // fire frame for each enabled active plugin of every type
+            Popcorn.forEach( Popcorn.manifest, function( key, val ) {
+
+              for ( var i = 0; i < self.data.running[ val ].length; i++ ) {
+              console.log( self.data.running[ val ][ i ] );
+                self.data.running[ val ][ i ]._natives.frame && self.data.running[ val ][ i ]._natives.frame.call( self, {}, self.data.running[ val ][ i ], self.currentTime() );
+              }
+            });
+            
             self.emit( "timeupdate" );
 
             !self.isDestroyed && requestAnimFrame( self.data.timeUpdate );
@@ -428,26 +483,42 @@
 
     disable: function( instance, plugin ) {
 
-      var disabled = instance.data.disabled;
+      //var disabled = instance.data.disabled;
 
-      if ( disabled.indexOf( plugin ) === -1 ) {
-        disabled.push( plugin );
+      //if ( !instance[ plugin ].disabled ) {
+        //disabled.push( plugin );
+      if ( !instance.data.disabled[ plugin ] ) {
+
+        instance.data.disabled[ plugin ] = true;
+
+        for ( var i = instance.data.running[ plugin ].length - 1, event; i >= 0; i-- ) {
+
+          event = instance.data.running[ plugin ][ i ];
+          event._natives.end.call( instance, null, event  );
+        }
       }
-
-      refresh( instance );
 
       return instance;
     },
     enable: function( instance, plugin ) {
 
-      var disabled = instance.data.disabled,
-          index = disabled.indexOf( plugin );
+      //var disabled = instance.data.disabled;
+      //    index = disabled.indexOf( plugin );
 
-      if ( index > -1 ) {
-        disabled.splice( index, 1 );
+      //if ( index > -1 ) {
+      //  disabled.splice( index, 1 );
+      //}
+      
+      if ( instance.data.disabled[ plugin ] ) {
+
+        instance.data.disabled[ plugin ] = false;
+
+        for ( var i = instance.data.running[ plugin ].length - 1, event; i >= 0; i-- ) {
+
+          event = instance.data.running[ plugin ][ i ];
+          event._natives.start.call( instance, null, event  );
+        }
       }
-
-      refresh( instance );
 
       return instance;
     },
@@ -590,7 +661,7 @@
 
     // Toggle a plugin's playback behaviour (on or off) per instance
     toggle: function( plugin ) {
-      return Popcorn[ this.data.disabled.indexOf( plugin ) > -1 ? "enable" : "disable" ]( this, plugin );
+      return Popcorn[ this.data.disabled[ plugin ] ? "enable" : "disable" ]( this, plugin );
     },
 
     // Set default values for plugin options objects per instance
@@ -882,24 +953,29 @@
     }
 
     // Display track event immediately if it's enabled and current
-    if ( track._natives &&
-        ( !!Popcorn.registryByName[ track._natives.type ] || !!obj[ track._natives.type ] ) ) {
+    //if ( track._natives &&
+    //    ( !!Popcorn.registryByName[ track._natives.type ] || !!obj[ track._natives.type ] ) ) {
+    if ( isPlayable( obj, track ) ) {
 
       currentTime = obj.media.currentTime;
-      if ( track.end > currentTime &&
-        track.start <= currentTime &&
-        obj.data.disabled.indexOf( track._natives.type ) === -1 ) {
+      //if ( track.end > currentTime &&
+      //  track.start <= currentTime ) {
 
         track._running = true;
-        track._natives.start.call( obj, null, track );
+        obj.data.running[ track._natives.type ].push( track );
 
-        if ( obj.options.frameAnimation &&
-          track._natives.frame ) {
+        if ( !obj.data.disabled[ track._natives.type ] ) {
 
-          obj.data.trackEvents.animating.push( track );
-          track._natives.frame.call( obj, null, track, currentTime );
+          track._natives.start.call( obj, null, track );
+
+          /*if ( obj.options.frameAnimation &&
+            track._natives.frame ) {
+
+            obj.data.trackEvents.animating.push( track );
+            track._natives.frame.call( obj, null, track, currentTime );
+          }*/
         }
-      }
+      //}
     }
 
     // update startIndex and endIndex
@@ -1086,10 +1162,10 @@
     var currentTime = obj.media.currentTime,
         previousTime = obj.data.trackEvents.previousUpdateTime,
         tracks = obj.data.trackEvents,
-        animating = tracks.animating,
+        //animating = tracks.animating,
         end = tracks.endIndex,
         start = tracks.startIndex,
-        animIndex = 0,
+        //animIndex = 0,
         byStartLen = tracks.byStart.length,
         byEndLen = tracks.byEnd.length,
         registryByName = Popcorn.registryByName,
@@ -1113,15 +1189,21 @@
               !!obj[ type ] ) ) {
 
           if ( byEnd._running === true ) {
-            byEnd._running = false;
-            natives.end.call( obj, event, byEnd );
 
-            obj.emit( trackend,
-              Popcorn.extend({}, byEnd, {
-                plugin: type,
-                type: trackend
-              })
-            );
+            byEnd._running = false;
+            obj.data.running[ type ].splice( obj.data.running[ type ].indexOf( byEnd ), 1 );
+
+            if ( !obj.data.disabled[ type ] ) {
+
+              natives.end.call( obj, event, byEnd );
+
+              obj.emit( trackend,
+                Popcorn.extend({}, byEnd, {
+                  plugin: type,
+                  type: trackend
+                })
+              );
+            }
           }
 
           end++;
@@ -1144,25 +1226,30 @@
               !!obj[ type ] ) ) {
 
           if ( byStart.end > currentTime &&
-                byStart._running === false &&
-                  obj.data.disabled.indexOf( type ) === -1 ) {
+                byStart._running === false ) {
 
             byStart._running = true;
-            natives.start.call( obj, event, byStart );
+            obj.data.running[ type ].push( byStart );
 
-            obj.emit( trackstart,
-              Popcorn.extend({}, byStart, {
-                plugin: type,
-                type: trackstart
-              })
-            );
+            // TODO: test this
+            if ( !obj.data.disabled[ type ] ) {
 
-            // If the `frameAnimation` option is used,
-            // push the current byStart object into the `animating` cue
-            if ( obj.options.frameAnimation &&
-                ( byStart && byStart._running && byStart._natives.frame ) ) {
+              natives.start.call( obj, event, byStart );
 
-              animating.push( byStart );
+              obj.emit( trackstart,
+                Popcorn.extend({}, byStart, {
+                  plugin: type,
+                  type: trackstart
+                })
+              );
+
+              // If the `frameAnimation` option is used,
+              // push the current byStart object into the `animating` cue
+              /*if ( obj.options.frameAnimation &&
+                  ( byStart && byStart._running && byStart._natives.frame ) ) {
+
+                animating.push( byStart );
+              }*/
             }
           }
           start++;
@@ -1175,7 +1262,7 @@
 
       // If the `frameAnimation` option is used, iterate the animating track
       // and execute the `frame` callback
-      if ( obj.options.frameAnimation ) {
+      /*if ( obj.options.frameAnimation ) {
         while ( animIndex < animating.length ) {
 
           byAnimate = animating[ animIndex ];
@@ -1187,7 +1274,7 @@
             animIndex++;
           }
         }
-      }
+      }*/
 
     // Playbar receding
     } else if ( previousTime > currentTime ) {
@@ -1204,15 +1291,21 @@
               !!obj[ type ] ) ) {
 
           if ( byStart._running === true ) {
-            byStart._running = false;
-            natives.end.call( obj, event, byStart );
 
-            obj.emit( trackend,
-              Popcorn.extend({}, byEnd, {
-                plugin: type,
-                type: trackend
-              })
-            );
+            byStart._running = false;
+            obj.data.running[ type ].splice( obj.data.running[ type ].indexOf( byStart ), 1 );
+
+            if ( !obj.data.disabled[ type ] ) {
+
+              natives.end.call( obj, event, byStart );
+
+              obj.emit( trackend,
+                Popcorn.extend({}, byEnd, {
+                  plugin: type,
+                  type: trackend
+                })
+              );
+            }
           }
           start--;
         } else {
@@ -1234,24 +1327,29 @@
               !!obj[ type ] ) ) {
 
           if ( byEnd.start <= currentTime &&
-                byEnd._running === false  &&
-                  obj.data.disabled.indexOf( type ) === -1 ) {
+                byEnd._running === false ) {
 
             byEnd._running = true;
-            natives.start.call( obj, event, byEnd );
+            obj.data.running[ type ].push( byEnd );
 
-            obj.emit( trackstart,
-              Popcorn.extend({}, byStart, {
-                plugin: type,
-                type: trackstart
-              })
-            );
-            // If the `frameAnimation` option is used,
-            // push the current byEnd object into the `animating` cue
-            if ( obj.options.frameAnimation &&
-                  ( byEnd && byEnd._running && byEnd._natives.frame ) ) {
+            if ( !obj.data.disabled[ type ] ) {
 
-              animating.push( byEnd );
+              natives.start.call( obj, event, byEnd );
+
+              obj.emit( trackstart,
+                Popcorn.extend({}, byStart, {
+                  plugin: type,
+                  type: trackstart
+                })
+              );
+
+              // If the `frameAnimation` option is used,
+              // push the current byEnd object into the `animating` cue
+              /*if ( obj.options.frameAnimation &&
+                    ( byEnd && byEnd._running && byEnd._natives.frame ) ) {
+
+                animating.push( byEnd );
+              }*/
             }
           }
           end--;
@@ -1264,7 +1362,7 @@
 
       // If the `frameAnimation` option is used, iterate the animating track
       // and execute the `frame` callback
-      if ( obj.options.frameAnimation ) {
+      /*if ( obj.options.frameAnimation ) {
         while ( animIndex < animating.length ) {
 
           byAnimate = animating[ animIndex ];
@@ -1276,8 +1374,7 @@
             animIndex++;
           }
         }
-      }
-    // time bar is not moving ( video is paused )
+      }*/
     }
 
     tracks.endIndex = end;
@@ -1399,7 +1496,7 @@
         args.unshift( null );
 
         // only call end if event is running
-        args[ 1 ]._running && natives.end.apply( this, args );
+        args[ 1 ]._running && this.data.running[ natives.type ].splice( this.data.running[ natives.type ].indexOf( options ), 1 ) && natives.end.apply( this, args );
       }, natives._teardown );
 
       // default to an empty string if no effect exists
@@ -1488,6 +1585,8 @@
     //  Extend Popcorn.p with new named definition
     //  Assign new named definition
     Popcorn.p[ name ] = plugin[ name ] = function( options ) {
+
+      this.data.running[ name ] = this.data.running[ name ] || [];
 
       // Merge with defaults if they exist, make sure per call is prioritized
       var defaults = ( this.options.defaults && this.options.defaults[ name ] ) || {},
