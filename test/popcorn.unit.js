@@ -2044,6 +2044,9 @@ test( "frame function (frameAnimation)", function() {
         frameAnimation: true
       }),
       fired = 0,
+      // TODO: this needs more testing.
+      // This only tests that addtrackevent fires frame,
+      // it never tests that frames are fired from update code
       expects = 1,
       count = 0;
 
@@ -3733,7 +3736,6 @@ asyncTest( "Popcorn.disable/enable/toggle (timeupdate)", function() {
   Popcorn.plugin( "toggler", function() {
     return {
       start: function() {
-      console.log( $pop.currentTime() );
       // TODO: check options
         startCalls++;
       },
