@@ -1,11 +1,131 @@
 Popcorn.player( "remixer", {
-  _canPlayType: function( nodeName, url ) {
+  _canPlayType: function( nodeName, source ) {
 
-    return ( typeof url !== "string" & url.length >= 1 );
+    // in the case of this, source is more like options
+    // keeping it called source here though,
+    // because later media.src is the same thing
+    return ( typeof source !== "string" && source.type &&
+             source.type === "sequence" && source.duration >= 0 );
   },
   _setup: function( options ) {
 
-    var i = 0,
+    var media = this,
+        medias = [],
+        duration = media.src.duration,
+        currentTime = 0,
+        containerPrime = document.getElementById( media.id );
+
+    if ( media.src.display === "black" ) {
+      containerPrime.style.backgroundColor = "black";
+    } else if ( media.src.display === "colour bars" || media.src.display === "color bars" ) {
+
+      containerPrime.classList.add( "colorbars" );
+      /*var topBar = document.createElement( "div" ),
+          middleBar = document.createElement( "div" ),
+          bottomBar = document.createElement( "div" ),
+          topBars = "#CCCCCC #FFFF00 #00FFFF #00FF00 #FF00FF #FF0000 #0000FF".split( " " ),
+          middleBars = "#0000FF #131313 #FF00FF #131313 #00FFFF #131313 #CCCCCC".split( " " ),
+          bottomBars = "#083E59 #FFFFFF #3A007E #131313 #000000 #131313 #262626 #131313".split( " " ),
+          tempBar, i;
+
+      topBar.style.height = "66.6666%";
+      middleBar.style.height = "8.3333%";
+      bottomBar.style.height = "25%";
+
+      for ( i = 0; i < topBars.length; i++ ) {
+        tempBar = document.createElement( "div" );
+        tempBar.style.backgroundColor = topBars[ i ];
+        tempBar.style.cssFloat = "left";
+        tempBar.style.width = "14.2857143%";
+        tempBar.style.height = "100%";
+        topBar.appendChild( tempBar );
+      }
+
+      for ( i = 0; i < middleBars.length; i++ ) {
+        tempBar = document.createElement( "div" );
+        tempBar.style.backgroundColor = middleBars[ i ];
+        tempBar.style.cssFloat = "left";
+        tempBar.style.width = "14.2857143%";
+        tempBar.style.height = "100%";
+        middleBar.appendChild( tempBar );
+      }
+
+      for ( i = 0; i < 4; i++ ) {
+        tempBar = document.createElement( "div" );
+        tempBar.style.backgroundColor = bottomBars[ i ];
+        tempBar.style.cssFloat = "left";
+        tempBar.style.width = "17.857142875%";
+        tempBar.style.height = "100%";
+        bottomBar.appendChild( tempBar );
+      }
+
+      for ( i = 0; i < 3; i++ ) {
+        tempBar = document.createElement( "div" );
+        tempBar.style.backgroundColor = bottomBars[ i + 4 ];
+        tempBar.style.cssFloat = "left";
+        tempBar.style.width = "4.7619047%";
+        tempBar.style.height = "100%";
+        bottomBar.appendChild( tempBar );
+      }
+
+      containerPrime.style.backgroundColor = "#131313";
+
+      containerPrime.appendChild( topBar );
+      containerPrime.appendChild( middleBar );
+      containerPrime.appendChild( bottomBar );*/
+    }
+
+    Popcorn.player.defineProperty( media, "currentTime", {
+      set: function( val ) {
+
+        // make sure val is a number
+        currentTime = Math.round( +val * 100 ) / 100;
+
+        if ( currentTime >= duration ) {
+          media.pause();
+          currentTime = duration;
+          return;
+        }
+
+        media.dispatchEvent( "timeupdate" );
+      },
+      get: function() {
+
+        return currentTime;
+      }
+    });
+
+    Popcorn.player.defineProperty( media, "duration", {
+      set: function( val ) {
+
+        // make sure val is a number
+        duration = Math.round( +val * 100 ) / 100;
+        media.dispatchEvent( "durationchange" );
+      },
+      get: function() {
+
+        return duration;
+      }
+    });
+
+    setTimeout ( function() {
+      media.duration = duration;
+      media.dispatchEvent( "durationchange" );
+      media.dispatchEvent( "loadedmetadata" );
+      media.dispatchEvent( "loadeddata" );
+      media.readyState = 4;
+      media.dispatchEvent( "canplaythrough" );
+    }, 0 );
+
+    media.addMedia = function( id, mediaObj ) {
+
+    };
+    media.updateMedia = function( id, mediaObj ) {
+
+    };
+    media.removeMedia = function( id ) {};
+
+    /*var i = 0,
         varps = [],
         media = this,
         loaded = 0,
@@ -198,7 +318,7 @@ Popcorn.player( "remixer", {
           media.dispatchEvent( "canplaythrough" );
         }
       });
-    }
+    }*/
   },
   _teardown: function( options ) {
 

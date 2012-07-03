@@ -14,6 +14,54 @@
       <script src="../../plugins/image/popcorn.image.js"></script>
       <script src="../../plugins/subtitle/popcorn.subtitle.js"></script>
       <script src="../../plugins/twitter/popcorn.twitter.js"></script>
+      <style>
+        .colorbars{
+          position: relative;
+          width: 100%;
+          background: #cccccc; /* Old browsers */
+          background: -moz-linear-gradient(left, #cccccc 0%, #cccccc 14.2857%, #ffff00 14.2857%, #ffff00 28.5714%, #00ffff 28.5714%, #00ffff 42.8571%, #00ff00 42.8571%, #00ff00 57.1429%, #ff00ff 57.1429%, #ff00ff 71.4286%, #ff0000 71.4286%, #ff0000 85.7143%, #0000ff 85.7143%, #0000ff 100%); /* FF3.6+ */
+          background: -webkit-gradient(linear, left top, right top, color-stop(0%,#cccccc), color-stop(14.2857%,#cccccc), color-stop(14.2857%,#ffff00), color-stop(28.5714%,#ffff00), color-stop(28.5714%,#00ffff), color-stop(42.8571%,#00ffff), color-stop(42.8571%,#00ff00), color-stop(57.1429%,#00ff00), color-stop(57.1429%,#ff00ff), color-stop(71.4286%,#ff00ff), color-stop(71.4286%,#ff0000), color-stop(85.7143%,#ff0000), color-stop(85.7143%,#0000ff), color-stop(100%,#0000ff)); /* Chrome,Safari4+ */
+          background: -webkit-linear-gradient(left, #cccccc 0%,#cccccc 14.2857%,#ffff00 14.2857%,#ffff00 28.5714%,#00ffff 28.5714%,#00ffff 42.8571%,#00ff00 42.8571%,#00ff00 57.1429%,#ff00ff 57.1429%,#ff00ff 71.4286%,#ff0000 71.4286%,#ff0000 85.7143%,#0000ff 85.7143%,#0000ff 100%); /* Chrome10+,Safari5.1+ */
+          background: -o-linear-gradient(left, #cccccc 0%,#cccccc 14.2857%,#ffff00 14.2857%,#ffff00 28.5714%,#00ffff 28.5714%,#00ffff 42.8571%,#00ff00 42.8571%,#00ff00 57.1429%,#ff00ff 57.1429%,#ff00ff 71.4286%,#ff0000 71.4286%,#ff0000 85.7143%,#0000ff 85.7143%,#0000ff 100%); /* Opera 11.10+ */
+          background: -ms-linear-gradient(left, #cccccc 0%,#cccccc 14.2857%,#ffff00 14.2857%,#ffff00 28.5714%,#00ffff 28.5714%,#00ffff 42.8571%,#00ff00 42.8571%,#00ff00 57.1429%,#ff00ff 57.1429%,#ff00ff 71.4286%,#ff0000 71.4286%,#ff0000 85.7143%,#0000ff 85.7143%,#0000ff 100%); /* IE10+ */
+          background: linear-gradient(to right, #cccccc 0%,#cccccc 14.2857%,#ffff00 14.2857%,#ffff00 28.5714%,#00ffff 28.5714%,#00ffff 42.8571%,#00ff00 42.8571%,#00ff00 57.1429%,#ff00ff 57.1429%,#ff00ff 71.4286%,#ff0000 71.4286%,#ff0000 85.7143%,#0000ff 85.7143%,#0000ff 100%); /* W3C */
+          filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#cccccc', endColorstr='#0000ff',GradientType=1 ); /* IE6-9 */
+        }
+
+        .colorbars:after{
+          position: absolute;
+          width: 100%;
+          display: block;
+          height: 8%;
+          top: 67%;
+          background: #0000ff; /* Old browsers */
+          background: -moz-linear-gradient(left, #0000ff 0%, #0000ff 14.2857143%, #131313 14.2857143%, #131313 28.5714286%, #ff00ff 28.5714286%, #ff00ff 42.8571429%, #131313 42.8571429%, #131313 57.1428572%, #00ffff 57.1428572%, #00ffff 71.4285715%, #131313 71.4285715%, #131313 85.7142858%, #cccccc 85.7142858%, #cccccc 100%); /* FF3.6+ */
+          background: -webkit-gradient(linear, left top, right top, color-stop(0%,#0000ff), color-stop(14.2857143%,#0000ff), color-stop(14.2857143%,#131313), color-stop(28.5714286%,#131313), color-stop(28.5714286%,#ff00ff), color-stop(42.8571429%,#ff00ff), color-stop(42.8571429%,#131313), color-stop(57.1428572%,#131313), color-stop(57.1428572%,#00ffff), color-stop(71.4285715%,#00ffff), color-stop(71.4285715%,#131313), color-stop(85.7142858%,#131313), color-stop(85.7142858%,#cccccc), color-stop(100%,#cccccc)); /* Chrome,Safari4+ */
+          background: -webkit-linear-gradient(left, #0000ff 0%,#0000ff 14.2857143%,#131313 14.2857143%,#131313 28.5714286%,#ff00ff 28.5714286%,#ff00ff 42.8571429%,#131313 42.8571429%,#131313 57.1428572%,#00ffff 57.1428572%,#00ffff 71.4285715%,#131313 71.4285715%,#131313 85.7142858%,#cccccc 85.7142858%,#cccccc 100%); /* Chrome10+,Safari5.1+ */
+          background: -o-linear-gradient(left, #0000ff 0%,#0000ff 14.2857143%,#131313 14.2857143%,#131313 28.5714286%,#ff00ff 28.5714286%,#ff00ff 42.8571429%,#131313 42.8571429%,#131313 57.1428572%,#00ffff 57.1428572%,#00ffff 71.4285715%,#131313 71.4285715%,#131313 85.7142858%,#cccccc 85.7142858%,#cccccc 100%); /* Opera 11.10+ */
+          background: -ms-linear-gradient(left, #0000ff 0%,#0000ff 14.2857143%,#131313 14.2857143%,#131313 28.5714286%,#ff00ff 28.5714286%,#ff00ff 42.8571429%,#131313 42.8571429%,#131313 57.1428572%,#00ffff 57.1428572%,#00ffff 71.4285715%,#131313 71.4285715%,#131313 85.7142858%,#cccccc 85.7142858%,#cccccc 100%); /* IE10+ */
+          background: linear-gradient(to right, #0000ff 0%,#0000ff 14.2857143%,#131313 14.2857143%,#131313 28.5714286%,#ff00ff 28.5714286%,#ff00ff 42.8571429%,#131313 42.8571429%,#131313 57.1428572%,#00ffff 57.1428572%,#00ffff 71.4285715%,#131313 71.4285715%,#131313 85.7142858%,#cccccc 85.7142858%,#cccccc 100%); /* W3C */
+          filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#0000ff', endColorstr='#cccccc',GradientType=1 ); /* IE6-9 */
+          content: " ";
+        }
+
+        .colorbars:before{
+          position: absolute;
+          width: 100%;
+          display: block;
+          height: 25%;
+          top: 75%;
+          background: #083e59; /* Old browsers */
+          background: -moz-linear-gradient(left,  #083e59 0%, #083e59 17.857142875%, #ffffff 17.857142875%, #ffffff 35.71428575%, #3a007e 35.71428575%, #3a007e 53.571428625%, #131313 53.571428625%, #131313 71.4285715%, #000000 71.4285715%, #000000 76.1904762%, #131313 76.1904762%, #131313 80.9523%, #262626 80.9523%, #262626 85.7142%, #131313 85.7142%, #131313 85.7142%); /* FF3.6+ */
+          background: -webkit-gradient(linear, left top, right top, color-stop(0%,#083e59), color-stop(17.857142875%,#083e59), color-stop(17.857142875%,#ffffff), color-stop(35.71428575%,#ffffff), color-stop(35.71428575%,#3a007e), color-stop(53.571428625%,#3a007e), color-stop(53.571428625%,#131313), color-stop(71.4285715%,#131313), color-stop(71.4285715%,#000000), color-stop(76.1904762%,#000000), color-stop(76.1904762%,#131313), color-stop(80.9523%,#131313), color-stop(80.9523%,#262626), color-stop(85.7142%,#262626), color-stop(85.7142%,#131313), color-stop(85.7142%,#131313)); /* Chrome,Safari4+ */
+          background: -webkit-linear-gradient(left,  #083e59 0%,#083e59 17.857142875%,#ffffff 17.857142875%,#ffffff 35.71428575%,#3a007e 35.71428575%,#3a007e 53.571428625%,#131313 53.571428625%,#131313 71.4285715%,#000000 71.4285715%,#000000 76.1904762%,#131313 76.1904762%,#131313 80.9523%,#262626 80.9523%,#262626 85.7142%,#131313 85.7142%,#131313 85.7142%); /* Chrome10+,Safari5.1+ */
+          background: -o-linear-gradient(left,  #083e59 0%,#083e59 17.857142875%,#ffffff 17.857142875%,#ffffff 35.71428575%,#3a007e 35.71428575%,#3a007e 53.571428625%,#131313 53.571428625%,#131313 71.4285715%,#000000 71.4285715%,#000000 76.1904762%,#131313 76.1904762%,#131313 80.9523%,#262626 80.9523%,#262626 85.7142%,#131313 85.7142%,#131313 85.7142%); /* Opera 11.10+ */
+          background: -ms-linear-gradient(left,  #083e59 0%,#083e59 17.857142875%,#ffffff 17.857142875%,#ffffff 35.71428575%,#3a007e 35.71428575%,#3a007e 53.571428625%,#131313 53.571428625%,#131313 71.4285715%,#000000 71.4285715%,#000000 76.1904762%,#131313 76.1904762%,#131313 80.9523%,#262626 80.9523%,#262626 85.7142%,#131313 85.7142%,#131313 85.7142%); /* IE10+ */
+          background: linear-gradient(to right,  #083e59 0%,#083e59 17.857142875%,#ffffff 17.857142875%,#ffffff 35.71428575%,#3a007e 35.71428575%,#3a007e 53.571428625%,#131313 53.571428625%,#131313 71.4285715%,#000000 71.4285715%,#000000 76.1904762%,#131313 76.1904762%,#131313 80.9523%,#262626 80.9523%,#262626 85.7142%,#131313 85.7142%,#131313 85.7142%); /* W3C */
+          filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#083e59', endColorstr='#131313',GradientType=1 ); /* IE6-9 */
+          content: " ";
+        }
+      </style>
       <script>
 
 
@@ -27,8 +75,12 @@
           var paused = true,
               popcorn;
 
-          popcorn = Popcorn.smart( '#video', [ [ 'http://www.youtube.com/watch?v=JLO1YIWQuXE', 'http://www.youtube.com/watch?v=nfGV32RNkhw&autoplay=0' ] ] );
-          
+          popcorn = Popcorn.smart( '#video', [ {
+            type: "sequence",
+            duration: 40,
+            display: "colour bars"
+          }]);
+
           popcorn = popcorn
             .footnote({
               start: 5, // seconds
@@ -108,7 +160,9 @@
             element( 'btn-play-pause' ).innerHTML = 'Play';
           });
 
-          element( 'player-status' ).innerHTML = 'Ready';
+          popcorn.listen( "canplaythrough", function() {
+            element( 'player-status' ).innerHTML = 'Ready';
+          });
           element( 'player_vol' ).innerHTML = popcorn.volume();
           
           // Single play/pause button
