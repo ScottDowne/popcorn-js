@@ -417,6 +417,10 @@
 
       playerReady = false;
 
+      if ( aSrc === "" ) {
+        return;
+      }
+
       SC.get( "/resolve", { url: aSrc }, function( data ) {
         elem = document.createElement( "iframe" );
         elem.id = Popcorn.guid( "soundcloud-" );

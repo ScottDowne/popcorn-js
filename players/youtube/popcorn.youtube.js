@@ -19,7 +19,6 @@
   onYouTubePlayerAPIReady.waiting = [];
 
   var _loading = false;
-
   Popcorn.player( "youtube", {
     _canPlayType: function( nodeName, url ) {
       return typeof url === "string" && videoIdRegex.test( url ) && nodeName.toLowerCase() !== "video";

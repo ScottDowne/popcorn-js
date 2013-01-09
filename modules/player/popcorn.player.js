@@ -362,10 +362,11 @@
     // Loop through each src, and find the first playable.
     for ( i = 0, srcLength = src.length; i < srcLength; i++ ) {
       srci = src[ i ];
-
       // See if we can use a wrapper directly, if not, try players.
       for ( j = 0; j < wrappers.length; j++ ) {
         mediaWrapper = Popcorn[ wrappers[ j ] ];
+        // fix https to be http
+        srci = srci.replace( /^https\:\/\/soundcloud\.com/, "http://soundcloud.com" );
         if ( mediaWrapper && mediaWrapper._canPlaySrc( srci ) === "probably" ) {
           media = mediaWrapper( node );
           popcorn = Popcorn( media, options );
